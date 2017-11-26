@@ -1,8 +1,21 @@
+"""
+    File name:  UART.py
+    Author:     Julien LE MELLEC
+    Mail:       julien.lemellec@gmail.com
+    Created:    25/11/17
+
+    Description: UART library
+
+"""
 import serial
 import time
 
 
 class UART:
+    """
+    Class UART
+    """
+
     def __init__(self, port):
 
         # configure the serial connections (the parameters differs on the device you are connecting to)
