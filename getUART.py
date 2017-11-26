@@ -12,6 +12,7 @@
 import sys
 
 from Init import Init
+from UART import UART
 
 
 class Main:
@@ -22,16 +23,18 @@ class Main:
     def __init__(self, argv):
 
         # init, initialization class
-        init = Init(argv)
+        self.init = Init(argv)
 
         # Get logger from Init class
-        self.logger = init.get_logger()
+        self.logger = self.init.get_logger()
 
     def main(self):
         """
         Main script function
         """
-        self.logger.info('I am the Main!!!!')
+        self.logger.info("Let's try UART!!!")
+        serial_com = UART(logger=self.logger, port=self.init.get_serial_port())
+        serial_com.playUART()
 
 
 if __name__ == "__main__":
