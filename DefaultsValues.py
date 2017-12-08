@@ -42,3 +42,13 @@ SET_TIME_SIZE           = 0x06
 CONFIGURE_SENSOR_SIZE   = 0x02
 CLEAN_DATA_SIZE         = 0x00
 GET_DATA_NUMBER_SIZE    = 0x00
+
+choices = [{'id': 1, 'text': 'Get temp'},
+           {'id': 2, 'text': 'Get time'},
+           {'id': 3, 'text': 'Set tme'},
+           {'id': 4, 'text': 'Configure sensor'},
+           {'id': 5, 'text': 'Clean data'},
+           {'id': 6, 'text': 'Get data number'},
+           {'id': 7, 'text': 'Export data current file'},
+           {'id': 8, 'text': 'Export data new file'},
+           {'id': 9, 'text': 'Log time'}]

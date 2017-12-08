@@ -11,9 +11,12 @@
 
 import sys
 import os
+import time
 
 from Init import Init
 from UART import UART
+
+from DefaultsValues import choices
 
 
 class Main:
@@ -33,32 +36,98 @@ class Main:
         """
         Main script function
         """
-        os.system('clear')
-        self.logger.info("#################################################################")
-        self.logger.info("                    Welcome to PIC interface                     ")
-        self.logger.info("#################################################################")
-
-        self.logger.info("\nSelect one of the following action:")
-        self.logger.info("1) Get temp")
-        self.logger.info("2) Get time")
-        self.logger.info("3) Set time")
-        self.logger.info("4) Configure sensor")
-        self.logger.info("5) Clean data")
-        self.logger.info("6) Get data number")
-
-        self.logger.info("7) Export data current file")
-        self.logger.info("8) Export data new file")
 
         while 1:
+            self.log_main_page()
+
             # get keyboard input
-            input = raw_input(">> ")
-            print input
-            if input == 'exit':
+            keyboard_input = raw_input(">> ")
+
+            if keyboard_input == '1' or keyboard_input == 'get_temp':
+                self.get_temp()
+            if keyboard_input == '2' or keyboard_input == 'get_time':
+                self.get_time()
+            if keyboard_input == '3' or keyboard_input == 'set_time':
+                self.set_time()
+            if keyboard_input == '9' or keyboard_input == 'log_time':
+                self.log_time()
+            elif keyboard_input == 'exit':
                 exit()
+            else:
+                self.logger.info("\nNo matching founded with {}".format(keyboard_input))
+                time.sleep(1)
+                self.logger.info("Back to main page")
+                time.sleep(1)
 
-
-        # serial_com = UART(logger=self.logger, port=self.init.get_serial_port())
+                # serial_com = UART(logger=self.logger, port=self.init.get_serial_port())
         # serial_com.playUART()
+
+    def log_main_page(self):
+        """
+        Log choices, related to choices list
+        """
+        os.system('clear')
+        self.logger.info("##################################################################")
+        self.logger.info("                Welcome to PIC interface Main page                ")
+        self.logger.info("##################################################################")
+        self.logger.info("\nSelect one of the following action:")
+
+        for choice in choices:
+            self.logger.info("{id}) {text}".format(id=choice.get('id'), text=choice.get('text')))
+
+    def get_temp(self):
+        """
+        Get temp
+        """
+        print "get_temp"
+
+    def get_time(self):
+        """
+        Get time
+        """
+        print "get_time"
+
+    def set_time(self):
+        """
+        Set time
+        """
+        print "set_time"
+
+    def configure_sensor(self):
+        """
+        Configure sensor
+        """
+        print "configure_sensor"
+
+    def clean_data(self):
+        """
+        Clean data
+        """
+        print "clean_data"
+
+    def get_data_number(self):
+        """
+        Get data number
+        """
+        print "get_data_number"
+
+    def export_data_current_file(self):
+        """
+        Export data current file
+        """
+        print "export_data_current_file"
+
+    def export_data_new_file(self):
+        """
+        Export data new file
+        """
+        print "export_data_new_file"
+
+    def log_time(self):
+        """
+        Log time
+        """
+        print "log_time"
 
 
 if __name__ == "__main__":
