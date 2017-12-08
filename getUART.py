@@ -7,6 +7,15 @@
 
     Description: Script to get data through UART
 
+    UART thread from python scipt:
+    |CMD|ARGS or not|LINE_FEED
+
+    Regular answer from PIC
+    |ACK|CMD|DATA|LINE_FEED
+
+    Error answer from PIC
+    |nACK|CMD|Error_code|LINE_FEED
+
 """
 
 import sys
@@ -47,7 +56,7 @@ class Main:
         Main script function
         """
         if self.init_UART_bit:
-            self.serial_com.open_UART()
+            self.serial_com.open_UART(True)
 
         while True:
             self.interface.log_main_page()
@@ -57,9 +66,9 @@ class Main:
                 keyboard_input = raw_input(">> ")
             except KeyboardInterrupt:
                 self.log.info("KeyboardInterrupt, this program is ending...")
-                exit()
+                exit(0)
             if keyboard_input == '0' or keyboard_input == 'connect':
-                self.serial_com.open_UART()
+                self.serial_com.open_UART(False)
                 self.interface.interface_selection()
             elif keyboard_input == '1' or keyboard_input == 'get_temp':
                 self.get_temp()
@@ -72,7 +81,7 @@ class Main:
             elif keyboard_input == 'p' or keyboard_input == 'ping':
                 self.ping()
             elif keyboard_input == 'exit' or keyboard_input == 'q':
-                exit()
+                exit(0)
             else:
                 self.log.info("\nNo matching founded with {}".format(keyboard_input))
                 time.sleep(1)
@@ -95,10 +104,8 @@ class Main:
         """
         if self.serial_com.send_UART_command(DefaultsValues.GET_TEMP):
             received_data = self.serial_com.parse_answer()
-
-            # hex_value = read_values.encode('hex')
-            # print " : ".join("{:02x}".format(ord(c))for c in read_values)
-            # #print "serial reception: {}".format(hex_value)
+            if received_data != 0:
+                self.log.info("temp = {},{}".format(ord(received_data[0]), ord(received_data[1])))
 
         self.interface.interface_selection()
 
@@ -107,12 +114,36 @@ class Main:
         Get time
         """
         self.log.info("Would you like to also compare time with local one? (y/n)")
+        binary_choice = raw_input('>> ')
+        if self.serial_com.send_UART_command(DefaultsValues.GET_TIME):
+            received_data = self.serial_com.parse_answer()
+            if received_data != 0:
+                self.log.info("Time from PIC")
+                self.log.info("years = {}".format(ord(received_data[0])))
+                self.log.info("months = {}".format(ord(received_data[1])))
+                self.log.info("days = {}".format(ord(received_data[2])))
+                self.log.info("hours = {}".format(ord(received_data[3])))
+                self.log.info("minutes = {}".format(ord(received_data[4])))
+                self.log.info("secondes = {}".format(ord(received_data[5])))
+
+        if binary_choice:
+            self.log_time()
 
     def set_time(self):
         """
         Set time
         """
-        print "set_time"
+        if self.serial_com.send_UART_command(DefaultsValues.SET_TIME,
+                                             [time.localtime().tm_year,
+                                              time.localtime().tm_mon,
+                                              time.localtime().tm_mday,
+                                              time.localtime().tm_hour,
+                                              time.localtime().tm_min,
+                                              time.localtime().tm_sec]):
+            if self.serial_com.parse_answer():
+                self.log.info("Time set successfully")
+
+        self.interface.interface_selection()
 
     def configure_sensor(self):
         """
@@ -148,7 +179,8 @@ class Main:
         """
         Log time
         """
-        self.log.info(time.localtime())
+        self.log.info("Actual time")
+        # self.log.info(time.localtime())
         self.log.info("year = {}".format(time.localtime().tm_year))
         self.log.info("month = {}".format(time.localtime().tm_mon))
         self.log.info("day = {}".format(time.localtime().tm_mday))

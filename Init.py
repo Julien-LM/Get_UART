@@ -31,11 +31,11 @@ class Init:
             opts, args = getopt.getopt(argv, "hdus:", ["serial=", "debug", "uart"])
         except getopt.GetoptError:
             self.usage()
-            sys.exit(2)
+            sys.exit(1)
         for opt, arg in opts:
             if opt == '-h' or opt == '--help':
                 self.usage()
-                sys.exit()
+                sys.exit(0)
             elif opt in ("-s", "--serial"):
                 self.serial_port = arg
                 self.log.info("Com port selected: {}".format(arg))

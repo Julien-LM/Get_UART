@@ -25,14 +25,15 @@ class Interface:
         """
         Function used to leave program or continue to main menu
         """
+        choice = 0
         self.log.info("\nPress 'q' to exit, Enter to continue to main menu")
         try:
             choice = raw_input('>> ')
         except KeyboardInterrupt:
             self.log.info("KeyboardInterrupt, this program is ending...")
-            exit()
+            exit(0)
         if choice == 'q' or choice == 'exit':
-            exit()
+            exit(0)
 
     def log_main_page(self):
         """
