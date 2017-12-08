@@ -22,7 +22,7 @@ class Init:
     def __init__(self, argv):
         """Constructor for Init"""
         logging.basicConfig(format='%(message)s', level=logging.INFO)
-        self.logger = logging.getLogger('')
+        self.log = logging.getLogger('')
 
         self.serial_port = DefaultsValues.COM_PORT
         self.init_UART_bit = False
@@ -38,13 +38,13 @@ class Init:
                 sys.exit()
             elif opt in ("-s", "--serial"):
                 self.serial_port = arg
-                self.logger.info("Com port selected: {}".format(arg))
+                self.log.info("Com port selected: {}".format(arg))
             elif opt in ("-d", "--debug"):
-                self.logger.setLevel(logging.DEBUG)
-                self.logger.info("Logging level set to DEBUG")
+                self.log.setLevel(logging.DEBUG)
+                self.log.info("Logging level set to DEBUG")
             elif opt in ("-u", "--uart"):
                 self.init_UART_bit = True
-                self.logger.info("UART will be automatically initialized")
+                self.log.info("UART will be automatically initialized")
 
     def get_logger(self):
         """
@@ -52,7 +52,7 @@ class Init:
         :return: logger
         :rtype: object
         """
-        return self.logger
+        return self.log
 
     def get_serial_port(self):
         """
@@ -74,10 +74,10 @@ class Init:
         """
         Script usage information
         """
-        self.logger.info('getUART version TODO')
-        self.logger.info('Usage: getUART')
-        self.logger.info('   or: getUART [arguments]')
+        self.log.info('getUART version TODO')
+        self.log.info('Usage: getUART')
+        self.log.info('   or: getUART [arguments]')
 
-        self.logger.info('Arguments:')
-        self.logger.info('  -d or --debug:    Set logger into debug mode')
-        self.logger.info('  -s or --serial:   Set serial port com')
+        self.log.info('Arguments:')
+        self.log.info('  -d or --debug:    Set logger into debug mode')
+        self.log.info('  -s or --serial:   Set serial port com')

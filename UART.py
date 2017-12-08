@@ -23,10 +23,10 @@ class UART:
                  byte_size=serial.EIGHTBITS):
 
         # get logger
-        self.logger = logger
+        self.log = logger
 
         # get interface
-        self.interface = Interface(self.logger)
+        self.interface = Interface(self.log)
 
         self.serial_com = None
 
@@ -45,22 +45,22 @@ class UART:
             try:
                 self.open_serial_com()
             except serial.serialutil.SerialException as e:
-                self.logger.error("Serial error({0}): {1}".format(e.errno, e.strerror))
+                self.log.error("Serial error({0}): {1}".format(e.errno, e.strerror))
                 self.interface.interface_selection()
             else:
-                self.logger.info("Serial com port have been initialized successfully")
+                self.log.info("Serial com port have been initialized successfully")
                 if self.is_open():
-                    self.logger.info("Serial com port is open")
+                    self.log.info("Serial com port is open")
 
             # Ping device
             if self.ping_device():
-                self.logger.info("Device is right answering")
+                self.log.info("Device is right answering")
             else:
-                self.logger.info("Device is offline...")
-                self.logger.info("Run a diagnostic for more information")
+                self.log.info("Device is offline...")
+                self.log.info("Run a diagnostic for more information")
                 self.interface.interface_selection()
         else:
-            self.logger.warning("\n!!!! Serial com have already be declared !!!!")
+            self.log.warning("\n!!!! Serial com have already be declared !!!!")
 
     def open_serial_com(self):
         """
@@ -81,6 +81,53 @@ class UART:
         :rtype: bool
         """
         return self.serial_com.isOpen()
+
+    def parse_answer(self):
+        """
+        Parse answer from PIC
+        :return: data from PIC
+        :rtype: int
+        """
+        received_thread = self.read()
+
+        # Check for Acknowledge
+        if received_thread[0] == DefaultsValues.ACKNOWLEDGE:
+            self.log.info("Acknowledge received")
+        else:
+            self.log.error("Acknowledge have not been received...")
+            return -1
+
+        # Check for line feed
+        if received_thread[-1] == DefaultsValues.LINE_FEED:
+            self.log.info("Line feed received")
+        else:
+            self.log.error("Line feed have not been received...")
+            return -1
+
+        # Check for command
+        if received_thread[1] == DefaultsValues.GET_TEMP:
+            return received_thread[2:4]
+        elif received_thread[1] == DefaultsValues.GET_TIME:
+            return received_thread[2:8]
+        elif received_thread[1] == DefaultsValues.SET_TIME:
+            return True
+        elif received_thread[1] == DefaultsValues.CONFIGURE_SENSOR:
+            return True
+        elif received_thread[1] == DefaultsValues.CLEAN_DATA:
+            return True
+        elif received_thread[1] == DefaultsValues.GET_DATA_NUMBER:
+            return received_thread[2]
+        else:
+            self.log.error("Unknown command received...")
+
+        # Parse each value received from PIC
+        for val in received_thread:
+            if val == DefaultsValues.ACKNOWLEDGE:
+                self.log.info("Acknowledge received")
+            print("{:02x}".format(ord(val)))
+
+        data = 0
+        return data
 
     def read(self):
         """

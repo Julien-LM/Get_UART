@@ -11,13 +11,11 @@
 
 import sys
 import time
-import serial
-
-from Init import Init
-from UART import UART
-from Interface import Interface
 
 import DefaultsValues
+from Init import Init
+from Interface import Interface
+from UART import UART
 
 
 class Main:
@@ -31,10 +29,10 @@ class Main:
         self.init = Init(argv)
 
         # Get logger from Init class
-        self.logger = self.init.get_logger()
+        self.log = self.init.get_logger()
 
         # Serial com variable definition
-        self.serial_com = UART(logger=self.logger,
+        self.serial_com = UART(logger=self.log,
                                port=self.init.get_serial_port(),
                                baud_rate=9600)
 
@@ -42,7 +40,7 @@ class Main:
         self.init_UART_bit = self.init.get_init_UART_bit()
 
         # Define interface class
-        self.interface = Interface(self.logger)
+        self.interface = Interface(self.log)
 
     def main(self):
         """
@@ -70,9 +68,9 @@ class Main:
             elif keyboard_input == 'exit' or keyboard_input == 'q':
                 exit()
             else:
-                self.logger.info("\nNo matching founded with {}".format(keyboard_input))
+                self.log.info("\nNo matching founded with {}".format(keyboard_input))
                 time.sleep(1)
-                self.logger.info("Back to main page")
+                self.log.info("Back to main page")
                 time.sleep(1)
 
     def get_temp(self):
@@ -80,17 +78,19 @@ class Main:
         Get temp
         """
         self.serial_com.send_UART_command(DefaultsValues.GET_TEMP)
-        read_values = self.serial_com.read()
-        hex_value = read_values.encode('hex')
-        print " : ".join("{:02x}".format(ord(c))for c in read_values)
-        #print "serial reception: {}".format(hex_value)
+        received_data = self.serial_com.parse_answer()
+
+        # hex_value = read_values.encode('hex')
+        # print " : ".join("{:02x}".format(ord(c))for c in read_values)
+        # #print "serial reception: {}".format(hex_value)
+
         self.interface.interface_selection()
 
     def get_time(self):
         """
         Get time
         """
-        self.logger.info("Would you like to also compare time with local one? (y/n)")
+        self.log.info("Would you like to also compare time with local one? (y/n)")
 
     def set_time(self):
         """
@@ -132,13 +132,13 @@ class Main:
         """
         Log time
         """
-        self.logger.info(time.localtime())
-        self.logger.info("year = {}".format(time.localtime().tm_year))
-        self.logger.info("month = {}".format(time.localtime().tm_mon))
-        self.logger.info("day = {}".format(time.localtime().tm_mday))
-        self.logger.info("hour = {}".format(time.localtime().tm_hour))
-        self.logger.info("minute = {}".format(time.localtime().tm_min))
-        self.logger.info("second = {}".format(time.localtime().tm_sec))
+        self.log.info(time.localtime())
+        self.log.info("year = {}".format(time.localtime().tm_year))
+        self.log.info("month = {}".format(time.localtime().tm_mon))
+        self.log.info("day = {}".format(time.localtime().tm_mday))
+        self.log.info("hour = {}".format(time.localtime().tm_hour))
+        self.log.info("minute = {}".format(time.localtime().tm_min))
+        self.log.info("second = {}".format(time.localtime().tm_sec))
         self.interface.interface_selection()
 
 
