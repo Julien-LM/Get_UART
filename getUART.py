@@ -10,13 +10,14 @@
 """
 
 import sys
-import os
 import time
+import serial
 
 from Init import Init
 from UART import UART
+from Interface import Interface
 
-from DefaultsValues import choices
+import DefaultsValues
 
 
 class Main:
@@ -32,26 +33,41 @@ class Main:
         # Get logger from Init class
         self.logger = self.init.get_logger()
 
+        # Serial com variable definition
+        self.serial_com = UART(logger=self.logger,
+                               port=self.init.get_serial_port(),
+                               baud_rate=9600)
+
+        # Is UART init a program beginning
+        self.init_UART_bit = self.init.get_init_UART_bit()
+
+        # Define interface class
+        self.interface = Interface(self.logger)
+
     def main(self):
         """
         Main script function
         """
+        if self.init_UART_bit:
+            self.serial_com.open_UART()
 
-        while 1:
-            self.log_main_page()
+        while True:
+            self.interface.log_main_page()
 
             # get keyboard input
             keyboard_input = raw_input(">> ")
-
-            if keyboard_input == '1' or keyboard_input == 'get_temp':
+            if keyboard_input == '0' or keyboard_input == 'connect':
+                self.serial_com.open_UART()
+                self.interface.interface_selection()
+            elif keyboard_input == '1' or keyboard_input == 'get_temp':
                 self.get_temp()
-            if keyboard_input == '2' or keyboard_input == 'get_time':
+            elif keyboard_input == '2' or keyboard_input == 'get_time':
                 self.get_time()
-            if keyboard_input == '3' or keyboard_input == 'set_time':
+            elif keyboard_input == '3' or keyboard_input == 'set_time':
                 self.set_time()
-            if keyboard_input == '9' or keyboard_input == 'log_time':
+            elif keyboard_input == '9' or keyboard_input == 'log_time':
                 self.log_time()
-            elif keyboard_input == 'exit':
+            elif keyboard_input == 'exit' or keyboard_input == 'q':
                 exit()
             else:
                 self.logger.info("\nNo matching founded with {}".format(keyboard_input))
@@ -59,33 +75,22 @@ class Main:
                 self.logger.info("Back to main page")
                 time.sleep(1)
 
-                # serial_com = UART(logger=self.logger, port=self.init.get_serial_port())
-        # serial_com.playUART()
-
-    def log_main_page(self):
-        """
-        Log choices, related to choices list
-        """
-        os.system('clear')
-        self.logger.info("##################################################################")
-        self.logger.info("                Welcome to PIC interface Main page                ")
-        self.logger.info("##################################################################")
-        self.logger.info("\nSelect one of the following action:")
-
-        for choice in choices:
-            self.logger.info("{id}) {text}".format(id=choice.get('id'), text=choice.get('text')))
-
     def get_temp(self):
         """
         Get temp
         """
-        print "get_temp"
+        self.serial_com.send_UART_command(DefaultsValues.GET_TEMP)
+        read_values = self.serial_com.read()
+        hex_value = read_values.encode('hex')
+        print " : ".join("{:02x}".format(ord(c))for c in read_values)
+        #print "serial reception: {}".format(hex_value)
+        self.interface.interface_selection()
 
     def get_time(self):
         """
         Get time
         """
-        print "get_time"
+        self.logger.info("Would you like to also compare time with local one? (y/n)")
 
     def set_time(self):
         """
@@ -127,7 +132,14 @@ class Main:
         """
         Log time
         """
-        print "log_time"
+        self.logger.info(time.localtime())
+        self.logger.info("year = {}".format(time.localtime().tm_year))
+        self.logger.info("month = {}".format(time.localtime().tm_mon))
+        self.logger.info("day = {}".format(time.localtime().tm_mday))
+        self.logger.info("hour = {}".format(time.localtime().tm_hour))
+        self.logger.info("minute = {}".format(time.localtime().tm_min))
+        self.logger.info("second = {}".format(time.localtime().tm_sec))
+        self.interface.interface_selection()
 
 
 if __name__ == "__main__":

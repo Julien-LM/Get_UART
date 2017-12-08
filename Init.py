@@ -25,9 +25,10 @@ class Init:
         self.logger = logging.getLogger('')
 
         self.serial_port = DefaultsValues.COM_PORT
+        self.init_UART_bit = False
 
         try:
-            opts, args = getopt.getopt(argv, "hds:", ["serial=", "debug"])
+            opts, args = getopt.getopt(argv, "hdus:", ["serial=", "debug", "uart"])
         except getopt.GetoptError:
             self.usage()
             sys.exit(2)
@@ -41,6 +42,9 @@ class Init:
             elif opt in ("-d", "--debug"):
                 self.logger.setLevel(logging.DEBUG)
                 self.logger.info("Logging level set to DEBUG")
+            elif opt in ("-u", "--uart"):
+                self.init_UART_bit = True
+                self.logger.info("UART will be automatically initialized")
 
     def get_logger(self):
         """
@@ -57,6 +61,14 @@ class Init:
         :rtype: String
         """
         return self.serial_port
+
+    def get_init_UART_bit(self):
+        """
+        uart init bit getter
+        :return: uart init
+        :rtype: bool
+        """
+        return self.init_UART_bit
 
     def usage(self):
         """
