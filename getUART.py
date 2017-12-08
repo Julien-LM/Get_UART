@@ -53,7 +53,11 @@ class Main:
             self.interface.log_main_page()
 
             # get keyboard input
-            keyboard_input = raw_input(">> ")
+            try:
+                keyboard_input = raw_input(">> ")
+            except KeyboardInterrupt:
+                self.log.info("KeyboardInterrupt, this program is ending...")
+                exit()
             if keyboard_input == '0' or keyboard_input == 'connect':
                 self.serial_com.open_UART()
                 self.interface.interface_selection()
@@ -65,6 +69,8 @@ class Main:
                 self.set_time()
             elif keyboard_input == '9' or keyboard_input == 'log_time':
                 self.log_time()
+            elif keyboard_input == 'p' or keyboard_input == 'ping':
+                self.ping()
             elif keyboard_input == 'exit' or keyboard_input == 'q':
                 exit()
             else:
@@ -73,16 +79,26 @@ class Main:
                 self.log.info("Back to main page")
                 time.sleep(1)
 
+    def ping(self):
+        """
+        Ping device
+        """
+        if self.serial_com.ping_device():
+            self.log.info("Device is right answering")
+        else:
+            self.log.error("Device is offline...")
+        self.interface.interface_selection()
+
     def get_temp(self):
         """
         Get temp
         """
-        self.serial_com.send_UART_command(DefaultsValues.GET_TEMP)
-        received_data = self.serial_com.parse_answer()
+        if self.serial_com.send_UART_command(DefaultsValues.GET_TEMP):
+            received_data = self.serial_com.parse_answer()
 
-        # hex_value = read_values.encode('hex')
-        # print " : ".join("{:02x}".format(ord(c))for c in read_values)
-        # #print "serial reception: {}".format(hex_value)
+            # hex_value = read_values.encode('hex')
+            # print " : ".join("{:02x}".format(ord(c))for c in read_values)
+            # #print "serial reception: {}".format(hex_value)
 
         self.interface.interface_selection()
 
@@ -140,6 +156,10 @@ class Main:
         self.log.info("minute = {}".format(time.localtime().tm_min))
         self.log.info("second = {}".format(time.localtime().tm_sec))
         self.interface.interface_selection()
+
+    def __del__(self):
+        self.serial_com.close_com_port()
+        self.log.info("Serial port com have been closed")
 
 
 if __name__ == "__main__":

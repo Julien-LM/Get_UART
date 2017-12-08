@@ -34,6 +34,7 @@ SET_TIME                = '\x22'
 CONFIGURE_SENSOR        = '\x30'
 CLEAN_DATA              = '\x31'
 GET_DATA_NUMBER         = '\x32'
+PING                    = '\x33'
 
 # Commands args size
 GET_TEMP_SIZE           = 0
@@ -52,4 +53,5 @@ choices = [{'id': 0, 'text': 'Connect to PIC'},
            {'id': 6, 'text': 'Get data number'},
            {'id': 7, 'text': 'Export data current file'},
            {'id': 8, 'text': 'Export data new file'},
-           {'id': 9, 'text': 'Log current time'}]
+           {'id': 9, 'text': 'Log current time'},
+           {'id': 'p', 'text': 'Ping device'}]

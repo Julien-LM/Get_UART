@@ -8,7 +8,6 @@
 
 """
 import serial
-import time
 
 import DefaultsValues
 from Interface import Interface
@@ -20,7 +19,7 @@ class UART:
     """
 
     def __init__(self, logger, port, baud_rate=9600, parity=serial.PARITY_NONE, stop_bits=serial.STOPBITS_ONE,
-                 byte_size=serial.EIGHTBITS):
+                 byte_size=serial.EIGHTBITS, timeout=500, write_timeout=500):
 
         # get logger
         self.log = logger
@@ -35,6 +34,8 @@ class UART:
         self.parity = parity
         self.stop_bits = stop_bits
         self.byte_size = byte_size
+        self.timeout = timeout
+        self.write_timeout = write_timeout
 
     def open_UART(self):
         """
@@ -71,7 +72,9 @@ class UART:
             baudrate=self.baud_rate,
             parity=self.parity,
             stopbits=self.stop_bits,
-            bytesize=self.byte_size
+            bytesize=self.byte_size,
+            timeout=self.timeout,
+            write_timeout=self.write_timeout
         )
 
     def is_open(self):
@@ -95,16 +98,17 @@ class UART:
             self.log.info("Acknowledge received")
         else:
             self.log.error("Acknowledge have not been received...")
-            return -1
+            return 0
 
         # Check for line feed
         if received_thread[-1] == DefaultsValues.LINE_FEED:
             self.log.info("Line feed received")
         else:
             self.log.error("Line feed have not been received...")
-            return -1
+            return 0
 
         # Check for command
+        self.log.info("Received command: 0x{:02x}".format(ord(received_thread[1])))
         if received_thread[1] == DefaultsValues.GET_TEMP:
             return received_thread[2:4]
         elif received_thread[1] == DefaultsValues.GET_TIME:
@@ -116,6 +120,8 @@ class UART:
         elif received_thread[1] == DefaultsValues.CLEAN_DATA:
             return True
         elif received_thread[1] == DefaultsValues.GET_DATA_NUMBER:
+            return received_thread[2]
+        elif received_thread[1] == DefaultsValues.PING:
             return received_thread[2]
         else:
             self.log.error("Unknown command received...")
@@ -150,9 +156,12 @@ class UART:
         Send command to device and check if it is answering well
 
         :return: return 1 si device answer, 0 if not
-        :rtype: int
+        :rtype: bool
         """
-        return 1
+
+        if not self.send_UART_command(DefaultsValues.PING):
+            return 0
+        return True if self.parse_answer() == DefaultsValues.PING else False
 
     def send_UART_command(self, command, args=0):
         """
@@ -162,34 +171,18 @@ class UART:
         :param args: args relative to command
         :type args: list
         """
+
+        if self.serial_com is None:
+            self.log.error("Com port is not open, do it before sending any command")
+            return 0
+
         self.write(command)
         self.write(args)
         self.write(DefaultsValues.LINE_FEED)
+        return 1
 
-    def playUART(self):
+    def close_com_port(self):
         """
-        Not define
+        Close port com
         """
-        print 'Enter your commands below.\r\nInsert "exit" to leave the application.'
-
-        while 1:
-            # get keyboard input
-            input = raw_input(">> ")
-            # Python 3 users
-            # input = input(">> ")
-            if input == 'exit':
-                self.serial_com.close()
-                exit()
-            else:
-                # send the character to the device
-                # (note that I happend a \r\n carriage return and line feed to the characters
-                # this is requested by my device)
-                self.serial_com.write(input + '\r\n')
-                out = ''
-                # let's wait one second before reading output (let's give device time to answer)
-                time.sleep(2)
-                while self.serial_com.inWaiting() > 0:
-                    out += self.serial_com.read(1)
-
-                if out != '':
-                    print ">>" + out
+        self.serial_com.close()
