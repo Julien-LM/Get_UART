@@ -104,7 +104,7 @@ class Main:
         if self.serial_com.send_UART_command(DefaultsValues.GET_TEMP):
             received_data = self.serial_com.parse_answer()
             if received_data != 0:
-                self.log.info("temp = {},{}".format(ord(received_data[0]), ord(received_data[1])))
+                self.log.info("temp = {},{}".format(received_data[0], received_data[1]))
 
     def get_time(self):
         """
@@ -117,15 +117,15 @@ class Main:
             if received_data != 0:
                 self.log.info("Time from PIC")
                 self.log.info("{day}/{month}/{century}{year} {hour}:{minute}:{seconds}\n".format(
-                    day=ord(received_data[3]), month=ord(received_data[2]), year=ord(received_data[1]),
-                    hour=ord(received_data[4]), minute=ord(received_data[5]), seconds=ord(received_data[6]),
-                    century=ord(received_data[0])))
-                # self.log.info("years = {}{}".format(ord(received_data[0]), ord(received_data[1])))
-                # self.log.info("months = {}".format(ord(received_data[2])))
-                # self.log.info("days = {}".format(ord(received_data[3])))
-                # self.log.info("hours = {}".format(ord(received_data[4])))
-                # self.log.info("minutes = {}".format(ord(received_data[5])))
-                # self.log.info("secondes = {}".format(ord(received_data[6])))
+                    day=received_data[3], month=received_data[2], year=received_data[1],
+                    hour=received_data[4], minute=received_data[5], seconds=received_data[6],
+                    century=received_data[0]))
+                # self.log.info("years = {}{}".format(received_data[0]), received_data[1]))
+                # self.log.info("months = {}".format(received_data[2]))
+                # self.log.info("days = {}".format(received_data[3]))
+                # self.log.info("hours = {}".format(received_data[4]))
+                # self.log.info("minutes = {}".format(received_data[5]))
+                # self.log.info("secondes = {}".format(received_data[6]))
 
         # if binary_choice == 'y':
         self.log_time()

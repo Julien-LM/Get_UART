@@ -14,6 +14,20 @@ import DefaultsValues
 from Interface import Interface
 
 
+def convert_to_int(data):
+    """
+
+    :param data: data from UART
+    :type data: unichar
+    :return: data converted to int
+    :rtype: list of int
+    """
+    out = []
+    for val in data:
+        out.append(ord(val))
+    return out
+
+
 class UART:
     """
     Class UART
@@ -128,9 +142,9 @@ class UART:
         # Check for command
         self.log.debug("Received command: 0x{:02x}".format(ord(received_thread[1])))
         if received_thread[1] == DefaultsValues.GET_TEMP:
-            return received_thread[2:4]
+            return convert_to_int(received_thread[2:4])
         elif received_thread[1] == DefaultsValues.GET_TIME:
-            return received_thread[2:9]
+            return convert_to_int(received_thread[2:9])
         elif received_thread[1] == DefaultsValues.SET_TIME:
             return True
         elif received_thread[1] == DefaultsValues.CONFIGURE_SENSOR:
@@ -188,7 +202,7 @@ class UART:
 
         :param command: command ref
         :type command: int
-        :param args: args relative to command
+        :param args: to complete command, list of int
         :type args: list
         """
         if args is None:
