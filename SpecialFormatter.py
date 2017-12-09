@@ -19,7 +19,7 @@ class SpecialFormatter(logging.Formatter):
 
     err_format = red+"ERROR: %(msg)s"+normal
     warn_format = yellow+"!!!WARNING!!! %(msg)s"+normal
-    dbg_format = green+"DBG: %(module)s: %(lineno)d: %(msg)s"+normal
+    dbg_format = green+"%(lineno)d:%(module)s:DBG: %(msg)s"+normal
     info_format = "%(msg)s"
 
     def __init__(self, fmt="%(levelno)s: %(msg)s"):

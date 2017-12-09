@@ -106,9 +106,8 @@ class UART:
             self.log.error("Exception raised during read lines")
             return 0
         # Parse each value received from PIC
+        self.log.debug("Received data:")
         for val in received_thread:
-            if val == DefaultsValues.ACKNOWLEDGE:
-                self.log.debug("Acknowledge received")
             self.log.debug("0x{:02x}".format(ord(val)))
 
         # Check for Acknowledge
@@ -135,7 +134,7 @@ class UART:
         if received_thread[1] == DefaultsValues.GET_TEMP:
             return received_thread[2:4]
         elif received_thread[1] == DefaultsValues.GET_TIME:
-            return received_thread[2:8]
+            return received_thread[2:9]
         elif received_thread[1] == DefaultsValues.SET_TIME:
             return True
         elif received_thread[1] == DefaultsValues.CONFIGURE_SENSOR:
@@ -169,10 +168,11 @@ class UART:
         """
 
         :param data: Data to send
-        :type data: String
+        :type data: byte
         :return: number of bytes written
         :rtype: int
         """
+        self.log.debug("0x{:02x}".format(ord(data)))
         return self.serial_com.write(data)
 
     def ping_device(self):
@@ -201,9 +201,10 @@ class UART:
             self.log.error("Com port is not open, do it before sending any command")
             return 0
 
+        self.log.debug("Write data:")
         data_send_count = self.write(command)
         for arg in args:
-            data_send_count += self.write(arg)
+            data_send_count += self.write(unichr(arg).encode('utf-8'))
         data_send_count += self.write(DefaultsValues.LINE_FEED)
 
         if data_send_count > 20:

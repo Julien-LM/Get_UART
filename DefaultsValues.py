@@ -54,7 +54,8 @@ choices = [{'id': 0, 'text': 'Connect to PIC'},
            {'id': 7, 'text': 'Export data current file'},
            {'id': 8, 'text': 'Export data new file'},
            {'id': 9, 'text': 'Log current time'},
-           {'id': 'p', 'text': 'Ping device'}]
+           {'id': 'p', 'text': 'Ping device'},
+           {'id': 'r', 'text': 'Recover overflow'}]
 
 # term log format
 
