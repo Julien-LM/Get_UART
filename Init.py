@@ -12,6 +12,7 @@ import logging
 import sys
 import getopt
 import DefaultsValues
+from SpecialFormatter import SpecialFormatter
 
 
 class Init:
@@ -22,19 +23,14 @@ class Init:
     def __init__(self, argv):
         """Constructor for Init"""
 
-        handler_error = logging.StreamHandler()
-        handler_error.setFormatter(logging.Formatter('ERROR !! %(message)s'))
-        handler_error.setLevel(logging.ERROR)
+        fmt = SpecialFormatter()
+        stream_handler = logging.StreamHandler(sys.stdout)
 
-        logging.basicConfig(format='%(message)s', level=logging.INFO)
+        stream_handler.setFormatter(fmt)
 
         self.log = logging.getLogger('get_UART')
         self.log.setLevel(logging.INFO)
-        self.log.addHandler(handler_error)
-
-
-        # self.log.setF
-        # logging.basicConfig(format='%(message)s', level=logging.INFO)
+        self.log.addHandler(stream_handler)
 
         self.serial_port = DefaultsValues.COM_PORT
         self.init_UART_bit = False
@@ -53,7 +49,7 @@ class Init:
                 self.log.info("Com port selected: {}".format(arg))
             elif opt in ("-d", "--debug"):
                 self.log.setLevel(logging.DEBUG)
-                self.log.info("Logging level set to DEBUG")
+                self.log.debug("Logging level set to DEBUG")
             elif opt in ("-u", "--uart"):
                 self.init_UART_bit = True
                 self.log.info("UART will be automatically initialized")
