@@ -38,7 +38,7 @@ class UART:
         self.timeout = timeout
         self.write_timeout = write_timeout
 
-    def open_UART(self, log_interface=True):
+    def open_UART(self):
         """
         UART class declaration and ping PIC
         """
@@ -48,8 +48,6 @@ class UART:
                 self.open_serial_com()
             except serial.serialutil.SerialException as e:
                 self.log.error("Serial error({0}): {1}".format(e.errno, e.strerror))
-                if log_interface:
-                    self.interface.interface_selection()
             else:
                 self.log.info("Serial com port have been initialized successfully")
                 if self.is_open():
@@ -57,14 +55,12 @@ class UART:
                 else:
                     self.log.error("!!! Com port not open !!!")
 
-            # Ping device
-            if self.ping_device():
-                self.log.info("Device is right answering")
-            else:
-                self.log.warning("Device is offline...")
-                self.log.info("Run a diagnostic for more information")
-                if log_interface:
-                    self.interface.interface_selection()
+                # Ping device
+                if self.ping_device():
+                    self.log.info("Device is right answering")
+                else:
+                    self.log.warning("Device is offline...")
+                    self.log.info("Run a diagnostic for more information")
         else:
             self.log.warning("\n!!!! Serial com have already be declared !!!!")
 

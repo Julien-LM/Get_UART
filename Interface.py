@@ -44,6 +44,7 @@ class Interface:
 
         if self.first_screen:
             self.first_screen = False
+            self.log.info("")
         else:
             os.system('clear')
 
@@ -62,5 +63,5 @@ class Interface:
         os.system('clear')
         self.log.info("##################################################################")
         self.log.info("                getUART initialization information                ")
-        self.log.info("##################################################################")
+        self.log.info("##################################################################\n")
 

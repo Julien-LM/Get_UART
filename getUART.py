@@ -56,7 +56,7 @@ class Main:
         Main script function
         """
         if self.init_UART_bit:
-            self.serial_com.open_UART(True)
+            self.serial_com.open_UART()
 
         while True:
             self.interface.log_main_page()
@@ -68,8 +68,7 @@ class Main:
                 self.log.info("KeyboardInterrupt, this program is ending...")
                 exit(0)
             if keyboard_input == '0' or keyboard_input == 'connect':
-                self.serial_com.open_UART(False)
-                self.interface.interface_selection()
+                self.serial_com.open_UART()
             elif keyboard_input == '1' or keyboard_input == 'get_temp':
                 self.get_temp()
             elif keyboard_input == '2' or keyboard_input == 'get_time':
