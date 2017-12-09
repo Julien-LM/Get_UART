@@ -8,9 +8,10 @@
     
 """
 
-from DefaultsValues import choices
-
+import logging
 import os
+
+from DefaultsValues import choices
 
 
 class Interface:
@@ -18,8 +19,8 @@ class Interface:
     Class which manage interface
     """
 
-    def __init__(self, logger):
-        self.log = logger
+    def __init__(self):
+        self.log = logging.getLogger('get_UART')
 
     def interface_selection(self):
         """

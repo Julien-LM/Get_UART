@@ -20,6 +20,7 @@
 
 import sys
 import time
+import logging
 
 import DefaultsValues
 from Init import Init
@@ -38,18 +39,17 @@ class Main:
         self.init = Init(argv)
 
         # Get logger from Init class
-        self.log = self.init.get_logger()
+        self.log = logging.getLogger('get_UART')
 
         # Serial com variable definition
-        self.serial_com = UART(logger=self.log,
-                               port=self.init.get_serial_port(),
+        self.serial_com = UART(port=self.init.get_serial_port(),
                                baud_rate=9600)
 
         # Is UART init a program beginning
         self.init_UART_bit = self.init.get_init_UART_bit()
 
         # Define interface class
-        self.interface = Interface(self.log)
+        self.interface = Interface()
 
     def main(self):
         """
@@ -190,8 +190,11 @@ class Main:
         self.interface.interface_selection()
 
     def __del__(self):
-        self.serial_com.close_com_port()
-        self.log.info("Serial port com have been closed")
+        if not self.serial_com.is_open():
+            self.log.info("Com port is not open")
+        else:
+            self.serial_com.close_com_port()
+            self.log.info("Serial port com have been closed")
 
 
 if __name__ == "__main__":

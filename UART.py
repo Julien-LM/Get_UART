@@ -8,6 +8,7 @@
 
 """
 import serial
+import logging
 
 import DefaultsValues
 from Interface import Interface
@@ -18,14 +19,14 @@ class UART:
     Class UART
     """
 
-    def __init__(self, logger, port, baud_rate=9600, parity=serial.PARITY_NONE, stop_bits=serial.STOPBITS_ONE,
+    def __init__(self, port, baud_rate=9600, parity=serial.PARITY_NONE, stop_bits=serial.STOPBITS_ONE,
                  byte_size=serial.EIGHTBITS, timeout=1, write_timeout=1):
 
         # get logger
-        self.log = logger
+        self.log = logging.getLogger('get_UART')
 
         # get interface
-        self.interface = Interface(self.log)
+        self.interface = Interface()
 
         self.serial_com = None
 
@@ -87,7 +88,9 @@ class UART:
         :return: Get the state of the serial port, whether it's open.
         :rtype: bool
         """
-        return self.serial_com.isOpen()
+        if self.serial_com is not None:
+            return self.serial_com.isOpen()
+        return False
 
     def parse_answer(self):
         """
@@ -98,6 +101,9 @@ class UART:
         received_thread = self.read()
         if received_thread == '':
             self.log.error("No value read on serial port")
+            return 0
+        if received_thread == -1:
+            self.log.error("Exception raised during read lines")
             return 0
         # Parse each value received from PIC
         for val in received_thread:
@@ -151,7 +157,7 @@ class UART:
         try:
             read_data = self.serial_com.readline()
         except serial.SerialException as e:
-            self.log.error("Serial error({0}): {1}".format(e.errno, e.strerror))
+            self.log.exception("Serial error({0}): {1}".format(e.errno, e.strerror))
             return -1
 
         if read_data == '':
