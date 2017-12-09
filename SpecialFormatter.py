@@ -9,6 +9,7 @@
 """
 
 import logging
+from DefaultsValues import red, yellow, green, normal
 
 
 class SpecialFormatter(logging.Formatter):
@@ -16,8 +17,9 @@ class SpecialFormatter(logging.Formatter):
     Special format file for logging
     """
 
-    err_format = "ERROR: %(msg)s"
-    dbg_format = "DBG: %(module)s: %(lineno)d: %(msg)s"
+    err_format = red+"ERROR: %(msg)s"+normal
+    warn_format = yellow+"!!!WARNING!!! %(msg)s"+normal
+    dbg_format = green+"DBG: %(module)s: %(lineno)d: %(msg)s"+normal
     info_format = "%(msg)s"
 
     def __init__(self, fmt="%(levelno)s: %(msg)s"):
@@ -41,6 +43,9 @@ class SpecialFormatter(logging.Formatter):
 
         elif record.levelno == logging.INFO:
             self._fmt = SpecialFormatter.info_format
+
+        elif record.levelno == logging.WARNING:
+            self._fmt = SpecialFormatter.warn_format
 
         elif record.levelno == logging.ERROR:
             self._fmt = SpecialFormatter.err_format

@@ -126,7 +126,7 @@ class Main:
                 self.log.info("minutes = {}".format(ord(received_data[4])))
                 self.log.info("secondes = {}".format(ord(received_data[5])))
 
-        if binary_choice:
+        if binary_choice == 'y':
             self.log_time()
 
     def set_time(self):
@@ -134,7 +134,8 @@ class Main:
         Set time
         """
         if self.serial_com.send_UART_command(DefaultsValues.SET_TIME,
-                                             [time.localtime().tm_year,
+                                             [
+                                                 # time.localtime().tm_year,
                                               time.localtime().tm_mon,
                                               time.localtime().tm_mday,
                                               time.localtime().tm_hour,

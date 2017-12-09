@@ -21,6 +21,7 @@ class Interface:
 
     def __init__(self):
         self.log = logging.getLogger('get_UART')
+        self.first_screen = True
 
     def interface_selection(self):
         """
@@ -40,7 +41,12 @@ class Interface:
         """
         Log choices, related to choices list
         """
-        os.system('clear')
+
+        if self.first_screen:
+            self.first_screen = False
+        else:
+            os.system('clear')
+
         self.log.info("##################################################################")
         self.log.info("                Welcome to PIC interface Main page                ")
         self.log.info("##################################################################")
@@ -48,4 +54,13 @@ class Interface:
 
         for choice in choices:
             self.log.info("{id}) {text}".format(id=choice.get('id'), text=choice.get('text')))
+
+    def log_init_info(self):
+        """
+        Log basic welcome screen
+        """
+        os.system('clear')
+        self.log.info("##################################################################")
+        self.log.info("                getUART initialization information                ")
+        self.log.info("##################################################################")
 

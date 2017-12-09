@@ -39,7 +39,7 @@ PING                    = '\x33'
 # Commands args size
 GET_TEMP_SIZE           = 0
 GET_TIME_SIZE           = 0
-SET_TIME_SIZE           = 6
+SET_TIME_SIZE           = 7
 CONFIGURE_SENSOR_SIZE   = 2
 CLEAN_DATA_SIZE         = 0
 GET_DATA_NUMBER_SIZE    = 0
@@ -55,3 +55,20 @@ choices = [{'id': 0, 'text': 'Connect to PIC'},
            {'id': 8, 'text': 'Export data new file'},
            {'id': 9, 'text': 'Log current time'},
            {'id': 'p', 'text': 'Ping device'}]
+
+# term log format
+
+normal = "\033[0m"
+black = "\033[30m"
+red = "\033[31m"
+green = "\033[32m"
+yellow = "\033[33m"
+blue = "\033[34m"
+purple = "\033[35m"
+cyan = "\033[36m"
+grey = "\033[37m"
+
+bold = "\033[1m"
+uline = "\033[4m"
+blink = "\033[5m"
+invert = "\033[7m"

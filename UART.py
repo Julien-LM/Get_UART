@@ -20,7 +20,7 @@ class UART:
     """
 
     def __init__(self, port, baud_rate=9600, parity=serial.PARITY_NONE, stop_bits=serial.STOPBITS_ONE,
-                 byte_size=serial.EIGHTBITS, timeout=1, write_timeout=1):
+                 byte_size=serial.EIGHTBITS, timeout=1, write_timeout=5):
 
         # get logger
         self.log = logging.getLogger('get_UART')
@@ -61,7 +61,7 @@ class UART:
             if self.ping_device():
                 self.log.info("Device is right answering")
             else:
-                self.log.info("Device is offline...")
+                self.log.warning("Device is offline...")
                 self.log.info("Run a diagnostic for more information")
                 if log_interface:
                     self.interface.interface_selection()
@@ -182,7 +182,7 @@ class UART:
         :return: return 1 si device answer, 0 if not
         :rtype: bool
         """
-
+        self.log.debug("Ping device")
         if not self.send_UART_command(DefaultsValues.PING):
             return 0
         return True if self.parse_answer() == DefaultsValues.PING else False
