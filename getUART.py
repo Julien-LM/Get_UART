@@ -104,7 +104,7 @@ class Main:
         if self.serial_com.send_UART_command(DefaultsValues.GET_TEMP):
             received_data = self.serial_com.parse_answer()
             if received_data != 0:
-                self.log.info("temp = {},{}".format(received_data[0], received_data[1]))
+                self.log.info("temp = {},{}".format(received_data[0], int(received_data[1]/25.6)))
 
     def get_time(self):
         """
