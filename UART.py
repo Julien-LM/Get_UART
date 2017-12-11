@@ -33,7 +33,7 @@ class UART:
     Class UART
     """
 
-    def __init__(self, port, baud_rate=9600, parity=serial.PARITY_NONE, stop_bits=serial.STOPBITS_ONE,
+    def __init__(self, port, baud_rate=19200, parity=serial.PARITY_NONE, stop_bits=serial.STOPBITS_ONE,
                  byte_size=serial.EIGHTBITS, timeout=1, write_timeout=5):
 
         # get logger

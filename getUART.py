@@ -43,7 +43,7 @@ class Main:
 
         # Serial com variable definition
         self.serial_com = UART(port=self.init.get_serial_port(),
-                               baud_rate=9600)
+                               baud_rate=19200)
 
         # Is UART init a program beginning
         self.init_UART_bit = self.init.get_init_UART_bit()
@@ -116,7 +116,7 @@ class Main:
             received_data = self.serial_com.parse_answer()
             if received_data != 0:
                 self.log.info("Time from PIC")
-                self.log.info("{day}/{month}/{century}{year} {hour}:{minute}:{seconds}\n".format(
+                self.log.info("{day:02d}/{month:02d}/{century}{year} {hour:02d}:{minute:02d}:{seconds:02d}\n".format(
                     day=received_data[3], month=received_data[2], year=received_data[1],
                     hour=received_data[4], minute=received_data[5], seconds=received_data[6],
                     century=received_data[0]))
