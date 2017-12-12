@@ -11,7 +11,7 @@
 COM_PORT = '/dev/ttyUSB0'
 
 # ASCII definition
-END_OF_TRANSMIT         = '\x04'
+END_OF_TRANSMIT         = '\xF4'
 START_OF_TEXT           = '\x02'
 ACKNOWLEDGE             = '\x06'
 LINE_FEED               = '\x0A'
@@ -36,11 +36,11 @@ CLEAN_DATA              = '\x31'
 GET_DATA_NUMBER         = '\x32'
 PING                    = '\x33'
 
-# Commands args size
-GET_TEMP_SIZE           = 0
-GET_TIME_SIZE           = 0
-SET_TIME_SIZE           = 7
-CONFIGURE_SENSOR_SIZE   = 2
+# Commands answer args size
+GET_TEMP_SIZE           = 2
+GET_TIME_SIZE           = 7
+SET_TIME_SIZE           = 0
+CONFIGURE_SENSOR_SIZE   = 0
 CLEAN_DATA_SIZE         = 0
 GET_DATA_NUMBER_SIZE    = 0
 
