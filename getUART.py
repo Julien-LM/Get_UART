@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding=utf-8
 """
     File name:  getUART.py
     Author:     Julien LE MELLEC
@@ -28,7 +29,7 @@ from Interface import Interface
 from UART import UART
 
 
-class Main:
+class Main(object):
     """
     Class Main
     """
@@ -42,8 +43,7 @@ class Main:
         self.log = logging.getLogger('get_UART')
 
         # Serial com variable definition
-        self.serial_com = UART(port=self.init.get_serial_port(),
-                               baud_rate=19200)
+        self.serial_com = UART(port=self.init.get_serial_port())
 
         # Is UART init a program beginning
         self.init_UART_bit = self.init.get_init_UART_bit()
@@ -62,11 +62,7 @@ class Main:
             self.interface.log_main_page()
 
             # get keyboard input
-            try:
-                keyboard_input = raw_input(">> ")
-            except KeyboardInterrupt:
-                self.log.info("KeyboardInterrupt, this program is ending...")
-                exit(0)
+            keyboard_input = self.interface.get_input_char()
             if keyboard_input == '0' or keyboard_input == 'connect':
                 self.serial_com.open_UART()
             elif keyboard_input == '1' or keyboard_input == 'get_temp':
@@ -75,6 +71,8 @@ class Main:
                 self.get_time()
             elif keyboard_input == '3' or keyboard_input == 'set_time':
                 self.set_time()
+            elif keyboard_input == '4' or keyboard_input == 'configure':
+                self.configure_sensor()
             elif keyboard_input == '9' or keyboard_input == 'log_time':
                 self.log_time()
             elif keyboard_input == 'p' or keyboard_input == 'ping':
@@ -103,32 +101,24 @@ class Main:
         """
         if self.serial_com.send_UART_command(DefaultsValues.GET_TEMP):
             received_data = self.serial_com.parse_answer()
-            if received_data != 0:
-                self.log.info("temp = {},{}".format(received_data[0], int(received_data[1]/25.6)))
+            if received_data:
+                self.log.info("temp = {},{}".format(received_data[0], int(received_data[1] / 25.6)))
 
     def get_time(self):
         """
         Get time
         """
-        # self.log.info("Would you like to also compare time with local one? (y/n)")
-        # binary_choice = raw_input('>> ')
+        # self.log.info("Wouaw_input('>> ')
         if self.serial_com.send_UART_command(DefaultsValues.GET_TIME):
             received_data = self.serial_com.parse_answer()
-            if received_data != 0:
+            if received_data:
                 self.log.info("Time from PIC")
                 self.log.info("{day:02d}/{month:02d}/{century}{year} {hour:02d}:{minute:02d}:{seconds:02d}\n".format(
                     day=received_data[3], month=received_data[2], year=received_data[1],
                     hour=received_data[4], minute=received_data[5], seconds=received_data[6],
                     century=received_data[0]))
-                # self.log.info("years = {}{}".format(received_data[0]), received_data[1]))
-                # self.log.info("months = {}".format(received_data[2]))
-                # self.log.info("days = {}".format(received_data[3]))
-                # self.log.info("hours = {}".format(received_data[4]))
-                # self.log.info("minutes = {}".format(received_data[5]))
-                # self.log.info("secondes = {}".format(received_data[6]))
 
-        # if binary_choice == 'y':
-        self.log_time()
+                self.log_time()
 
     def set_time(self):
         """
@@ -147,15 +137,42 @@ class Main:
 
     def configure_sensor(self):
         """
-        Configure sensor
+        Send getting temp rate
+        First 6 bits, value: from 0 to 63
+        Last 2 bits, unit: see DefaultsValues
+        return 0 if error detected
         """
-        print "configure_sensor"
+        unit = -1
+        self.log.info("Enter time unit (seconds, minutes, hours)")
+        keyboard_input = self.interface.get_input_char()
+        for time_unit in DefaultsValues.TimeUnitValues:
+            if keyboard_input in time_unit:
+                self.log.info("Correct input, selected value: {}".format(time_unit))
+                unit = DefaultsValues.TimeUnitValues.get(time_unit)
+                break
+        if unit == -1:
+            self.log.warning("Wrong input... Back to main menu")
+            return 0
+
+        self.log.info("Enter time value, from 1 to 60")
+        keyboard_input = self.interface.get_input_int()
+        if 1 <= keyboard_input <= 60:
+            self.log.info("Correct input, selected value: {}".format(keyboard_input))
+        else:
+            self.log.warning("Wrong input... Back to main menu")
+            return 0
+
+        if self.serial_com.send_UART_command(DefaultsValues.CONFIGURE_SENSOR,
+                                             [keyboard_input + (unit << 6)]):
+            self.log.debug("Arg: {arg:08b}, hex: {arg:02x}".format(arg=keyboard_input + (unit << 6)))
+            if self.serial_com.parse_answer():
+                self.log.info("Sensor configured successfully")
 
     def clean_data(self):
         """
         Clean data
         """
-        print "clean_data"
+        print 'clean_data'
 
     def get_data_number(self):
         """
@@ -180,18 +197,10 @@ class Main:
         Log time
         """
         self.log.info("Actual time")
-        # self.log.info(time.localtime())
         self.log.info("{day:02d}/{month:02d}/{year} {hour:02d}:{minute:02d}:{seconds:02d}\n".format(
             day=time.localtime().tm_mday, month=time.localtime().tm_mon,
             year=time.localtime().tm_year, hour=time.localtime().tm_hour,
             minute=time.localtime().tm_min, seconds=time.localtime().tm_sec))
-
-        # self.log.info("year = {}".format(time.localtime().tm_year))
-        # self.log.info("month = {}".format(time.localtime().tm_mon))
-        # self.log.info("day = {}".format(time.localtime().tm_mday))
-        # self.log.info("hour = {}".format(time.localtime().tm_hour))
-        # self.log.info("minute = {}".format(time.localtime().tm_min))
-        # self.log.info("second = {}".format(time.localtime().tm_sec))
 
     def recover_overflow(self):
         """

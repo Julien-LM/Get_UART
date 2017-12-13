@@ -23,17 +23,37 @@ class Interface:
         self.log = logging.getLogger('get_UART')
         self.first_screen = True
 
+    def get_input_char(self):
+        """
+        :return: Data coming from keyboard
+        :rtype: String
+        """
+        input_data = 0
+        try:
+            input_data = raw_input('>> ')
+        except KeyboardInterrupt:
+            self.log.info("KeyboardInterrupt, this program is ending...")
+            exit(0)
+        return input_data
+
+    def get_input_int(self):
+        """
+        :return: Data coming from keyboard
+        :rtype: String
+        """
+        input_data = self.get_input_char()
+        try:
+            return int(input_data)
+        except ValueError:
+            self.log.error("Input value is not an integer... ")
+            return -1
+
     def interface_selection(self):
         """
         Function used to leave program or continue to main menu
         """
-        choice = 0
         self.log.info("\nPress 'q' to exit, Enter to continue to main menu")
-        try:
-            choice = raw_input('>> ')
-        except KeyboardInterrupt:
-            self.log.info("KeyboardInterrupt, this program is ending...")
-            exit(0)
+        choice = self.get_input_char()
         if choice == 'q' or choice == 'exit':
             exit(0)
 

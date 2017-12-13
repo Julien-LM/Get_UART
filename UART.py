@@ -106,57 +106,53 @@ class UART:
         """
         Parse answer from PIC
         :return: data from PIC
-        :rtype: int
+        :rtype: list
         """
         received_thread, received_error = self.read()
         if received_error:
             self.log.error("Issue occurred during serial com read...")
-            return 0
+            return []
 
         # Parse each value received from PIC
-        self.log.debug("Received data:")
         if len(received_thread) > 2:
-            self.log.debug("Number of data received: {}".format(len(received_thread)))
-            for val in received_thread:
-                self.log.debug("0x{:02x}".format(ord(val)))
 
             # Check for Acknowledge
             if received_thread[0] == DefaultsValues.ACKNOWLEDGE:
                 self.log.debug("Acknowledge received")
             elif received_thread[0] == DefaultsValues.NEG_ACKNOWLEDGE:
                 self.log.error("Neg Acknowledge received...")
-                self.log.error("Relative command: 0x{:02x}".format(ord(received_thread[1])))
-                self.log.error("Error code: 0x{:02x}".format(ord(received_thread[2])))
-                return 0
+                self.log.error("Relative command: 0x{:02x}".format(received_thread[1]))
+                self.log.error("Error code: 0x{:02x}".format(received_thread[2]))
+                return []
             else:
                 self.log.error("Acknowledge have not been received...")
-                return 0
+                return []
         else:
             self.log.error("Received data is not long enough...")
             self.log.error("Required: <=2 obtained: {}".format(len(received_thread)))
-            return 0
+            return []
 
         # Check for line feed
         if received_thread[-1] == DefaultsValues.END_OF_TRANSMIT:
             self.log.debug("End of transmit char received")
         else:
             self.log.error("End of transmit chard have not been received...")
-            return 0
+            return []
 
         # Check for command
-        self.log.debug("Received command: 0x{:02x}".format(ord(received_thread[1])))
+        self.log.debug("Received command: 0x{:02x}".format(received_thread[1]))
         if received_thread[1] == DefaultsValues.GET_TEMP:
             if len(received_thread) > DefaultsValues.GET_TEMP_SIZE+2:
-                return convert_to_int(received_thread[2:4])
+                return received_thread[2:4]
             else:
                 self.log.error("Get time args to short...")
-                return 0
+                return []
         elif received_thread[1] == DefaultsValues.GET_TIME:
             if len(received_thread) > DefaultsValues.GET_TIME_SIZE + 2:
-                return convert_to_int(received_thread[2:9])
+                return received_thread[2:9]
             else:
                 self.log.error("Get time args to short...")
-                return 0
+                return []
         elif received_thread[1] == DefaultsValues.SET_TIME:
             return True
         elif received_thread[1] == DefaultsValues.CONFIGURE_SENSOR:
@@ -169,7 +165,7 @@ class UART:
             return received_thread[2]
         else:
             self.log.error("Unknown command received...")
-            return 0
+            return []
 
     def read(self):
         """
@@ -179,17 +175,21 @@ class UART:
         """
         read_data = []
         index = 0
+        self.log.debug("Start read data:")
         while True:
             try:
-                read_data.append(self.serial_com.read())
+                read_data.append(ord(self.serial_com.read()))
+                self.log.debug("0x{:02x}".format(read_data[index]))
             except serial.SerialException as e:
                 self.log.exception("Serial error({0}): {1}".format(e.errno, e.strerror))
                 return read_data, True
-            if read_data[index] == DefaultsValues.END_OF_TRANSMIT:
-                return read_data, False
-            if read_data[index] == '':
+            except TypeError:
                 self.log.error("Timeout occurred, device did not send anything for 1sec")
                 return read_data, True
+            if read_data[index] == DefaultsValues.END_OF_TRANSMIT:
+                self.log.debug("Number of data received: {}".format(len(read_data)))
+                return read_data, False
+
             index += 1
 
     def write(self, data):
@@ -200,8 +200,8 @@ class UART:
         :return: number of bytes written
         :rtype: int
         """
-        self.log.debug("0x{:02x}".format(ord(data)))
-        return self.serial_com.write(data)
+        self.log.debug("0x{:02x}".format(data))
+        return self.serial_com.write(bytearray.fromhex("{0:02x}".format(data)))
 
     def ping_device(self):
         """
@@ -232,7 +232,7 @@ class UART:
         self.log.debug("Write data:")
         data_send_count = self.write(command)
         for arg in args:
-            data_send_count += self.write(unichr(arg).encode('utf-8'))
+            data_send_count += self.write(arg)
         data_send_count += self.write(DefaultsValues.END_OF_TRANSMIT)
 
         if data_send_count > 20:
