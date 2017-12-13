@@ -165,8 +165,10 @@ class Main(object):
         if self.serial_com.send_UART_command(DefaultsValues.CONFIGURE_SENSOR,
                                              [keyboard_input + (unit << 6)]):
             self.log.debug("Arg: {arg:08b}, hex: {arg:02x}".format(arg=keyboard_input + (unit << 6)))
-            if self.serial_com.parse_answer():
+            received_data = self.serial_com.parse_answer()
+            if received_data:
                 self.log.info("Sensor configured successfully")
+                self.log.debug("Value in sec: {}:{}".format(received_data[1], received_data[0]))
 
     def clean_data(self):
         """

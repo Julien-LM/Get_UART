@@ -145,18 +145,22 @@ class UART:
             if len(received_thread) > DefaultsValues.GET_TEMP_SIZE+2:
                 return received_thread[2:4]
             else:
-                self.log.error("Get time args to short...")
+                self.log.error("Get time args too short...")
                 return []
         elif received_thread[1] == DefaultsValues.GET_TIME:
             if len(received_thread) > DefaultsValues.GET_TIME_SIZE + 2:
                 return received_thread[2:9]
             else:
-                self.log.error("Get time args to short...")
+                self.log.error("Get time args too short...")
                 return []
         elif received_thread[1] == DefaultsValues.SET_TIME:
             return True
         elif received_thread[1] == DefaultsValues.CONFIGURE_SENSOR:
-            return True
+            if len(received_thread) > DefaultsValues.CONFIGURE_SENSOR_SIZE+2:
+                return received_thread[2:4]
+            else:
+                self.log.error("Configure sensor args too short...")
+                return []
         elif received_thread[1] == DefaultsValues.CLEAN_DATA:
             return True
         elif received_thread[1] == DefaultsValues.GET_DATA_NUMBER:

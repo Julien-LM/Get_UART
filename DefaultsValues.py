@@ -40,7 +40,7 @@ PING                    = 0x33
 GET_TEMP_SIZE           = 2
 GET_TIME_SIZE           = 7
 SET_TIME_SIZE           = 0
-CONFIGURE_SENSOR_SIZE   = 0
+CONFIGURE_SENSOR_SIZE   = 2
 CLEAN_DATA_SIZE         = 0
 GET_DATA_NUMBER_SIZE    = 0
 
