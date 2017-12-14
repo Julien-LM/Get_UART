@@ -1,3 +1,4 @@
+# coding=utf-8
 """
     File name:  Defaults_values.py
     Author:     Julien LE MELLEC
@@ -35,14 +36,21 @@ CONFIGURE_SENSOR        = 0x30
 CLEAN_DATA              = 0x31
 GET_DATA_NUMBER         = 0x32
 PING                    = 0x33
+GET_REAL_TIME_INFO      = 0x34
+
+# Temp data transfer protocol
+TIME_TRANSFERT_IND      = 0xFD
+S_RATE_TRANSFERT_IND    = 0xFC
+TIME_TRANSFERT_IND_S    = 0x07
+S_RATE_TRANSFERT_IND_S  = 0x04
 
 # Commands answer args size
-GET_TEMP_SIZE           = 2
 GET_TIME_SIZE           = 7
 SET_TIME_SIZE           = 0
 CONFIGURE_SENSOR_SIZE   = 2
 CLEAN_DATA_SIZE         = 0
-GET_DATA_NUMBER_SIZE    = 0
+GET_DATA_NUMBER_SIZE    = 2
+GET_REAL_TIME_INFO_SIZE = 2
 
 #Config Sensor Unit
 SECONDS                 = 0
@@ -64,7 +72,8 @@ choices = [{'id': 0, 'text': 'Connect to PIC'},
            {'id': 8, 'text': 'Export data new file'},
            {'id': 9, 'text': 'Log current time'},
            {'id': 'p', 'text': 'Ping device'},
-           {'id': 'r', 'text': 'Recover overflow'}]
+           {'id': 'r', 'text': 'Recover overflow'},
+           {'id': 'i', 'text': 'Get real time info'}]
 
 # term log format
 normal = "\033[0m"

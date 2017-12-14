@@ -1,3 +1,4 @@
+# coding=utf-8
 """
     File name:  SpecialFormatter.py
     Author:     Julien LE MELLEC

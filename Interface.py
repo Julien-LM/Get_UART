@@ -1,3 +1,4 @@
+# coding=utf-8
 """
     File name:  Interface.py
     Author:     Julien LE MELLEC
@@ -14,7 +15,7 @@ import os
 from DefaultsValues import choices
 
 
-class Interface:
+class Interface(object):
     """
     Class which manage interface
     """
@@ -23,6 +24,7 @@ class Interface:
         self.log = logging.getLogger('get_UART')
         self.first_screen = True
 
+    @property
     def get_input_char(self):
         """
         :return: Data coming from keyboard
@@ -41,7 +43,7 @@ class Interface:
         :return: Data coming from keyboard
         :rtype: String
         """
-        input_data = self.get_input_char()
+        input_data = self.get_input_char
         try:
             return int(input_data)
         except ValueError:
@@ -53,7 +55,7 @@ class Interface:
         Function used to leave program or continue to main menu
         """
         self.log.info("\nPress 'q' to exit, Enter to continue to main menu")
-        choice = self.get_input_char()
+        choice = self.get_input_char
         if choice == 'q' or choice == 'exit':
             exit(0)
 
@@ -84,4 +86,3 @@ class Interface:
         self.log.info("##################################################################")
         self.log.info("                getUART initialization information                ")
         self.log.info("##################################################################\n")
-

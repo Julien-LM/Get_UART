@@ -1,3 +1,4 @@
+# coding=utf-8
 """
     File name:  Init.py
     Author:     Julien LE MELLEC
@@ -16,7 +17,7 @@ from SpecialFormatter import SpecialFormatter
 from Interface import Interface
 
 
-class Init:
+class Init(object):
     """
     Class Init
     """

@@ -62,7 +62,7 @@ class Main(object):
             self.interface.log_main_page()
 
             # get keyboard input
-            keyboard_input = self.interface.get_input_char()
+            keyboard_input = self.interface.get_input_char
             if keyboard_input == '0' or keyboard_input == 'connect':
                 self.serial_com.open_UART()
             elif keyboard_input == '1' or keyboard_input == 'get_temp':
@@ -79,6 +79,8 @@ class Main(object):
                 self.ping()
             elif keyboard_input == 'r' or keyboard_input == 'recover':
                 self.recover_overflow()
+            elif keyboard_input == 'i' or keyboard_input == 'get_real_time':
+                self.get_real_time_info()
             elif keyboard_input == 'exit' or keyboard_input == 'q':
                 exit(0)
             else:
@@ -97,9 +99,28 @@ class Main(object):
 
     def get_temp(self):
         """
-        Get temp
+        Get temp storage
         """
-        if self.serial_com.send_UART_command(DefaultsValues.GET_TEMP):
+        # First get number of data into the storage
+        data_number = self.get_data_number()
+        if data_number:
+            if self.serial_com.send_UART_command(DefaultsValues.GET_TEMP):
+                received_data = self.serial_com.parse_answer()
+                if received_data:
+                    if data_number == len(received_data):
+                        self.log.info("Data received OK!!")
+                        # for data in received_data:
+                        #     self.log.info("data = 0x{:02x}".format(data))
+                    else:
+                        self.log.error("Number of read data does not match with expected value")
+        else:
+            self.log.warning("Storage empty... No data to read!")
+
+    def get_real_time_info(self):
+        """
+        Get every real time info
+        """
+        if self.serial_com.send_UART_command(DefaultsValues.GET_REAL_TIME_INFO):
             received_data = self.serial_com.parse_answer()
             if received_data:
                 self.log.info("temp = {},{}".format(received_data[0], int(received_data[1] / 25.6)))
@@ -108,7 +129,6 @@ class Main(object):
         """
         Get time
         """
-        # self.log.info("Wouaw_input('>> ')
         if self.serial_com.send_UART_command(DefaultsValues.GET_TIME):
             received_data = self.serial_com.parse_answer()
             if received_data:
@@ -144,7 +164,7 @@ class Main(object):
         """
         unit = -1
         self.log.info("Enter time unit (seconds, minutes, hours)")
-        keyboard_input = self.interface.get_input_char()
+        keyboard_input = self.interface.get_input_char
         for time_unit in DefaultsValues.TimeUnitValues:
             if keyboard_input in time_unit:
                 self.log.info("Correct input, selected value: {}".format(time_unit))
@@ -180,7 +200,14 @@ class Main(object):
         """
         Get data number
         """
-        print "get_data_number"
+        if self.serial_com.send_UART_command(DefaultsValues.GET_DATA_NUMBER):
+            received_data = self.serial_com.parse_answer()
+            if received_data:
+                self.log.debug("Value: {}:{}".format(received_data[1], received_data[0]))
+                temp_data_number = received_data[0] + (received_data[1] << 8)
+                self.log.info("temp_data_number = {}".format(temp_data_number))
+                return temp_data_number
+        return 0
 
     def export_data_current_file(self):
         """

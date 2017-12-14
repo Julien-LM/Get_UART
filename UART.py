@@ -1,3 +1,4 @@
+# coding=utf-8
 """
     File name:  UART.py
     Author:     Julien LE MELLEC
@@ -28,7 +29,7 @@ def convert_to_int(data):
     return out
 
 
-class UART:
+class UART(object):
     """
     Class UART
     """
@@ -142,11 +143,7 @@ class UART:
         # Check for command
         self.log.debug("Received command: 0x{:02x}".format(received_thread[1]))
         if received_thread[1] == DefaultsValues.GET_TEMP:
-            if len(received_thread) > DefaultsValues.GET_TEMP_SIZE+2:
-                return received_thread[2:4]
-            else:
-                self.log.error("Get time args too short...")
-                return []
+            return received_thread[2:(len(received_thread)-1)]
         elif received_thread[1] == DefaultsValues.GET_TIME:
             if len(received_thread) > DefaultsValues.GET_TIME_SIZE + 2:
                 return received_thread[2:9]
@@ -156,7 +153,7 @@ class UART:
         elif received_thread[1] == DefaultsValues.SET_TIME:
             return True
         elif received_thread[1] == DefaultsValues.CONFIGURE_SENSOR:
-            if len(received_thread) > DefaultsValues.CONFIGURE_SENSOR_SIZE+2:
+            if len(received_thread) > DefaultsValues.CONFIGURE_SENSOR_SIZE + 2:
                 return received_thread[2:4]
             else:
                 self.log.error("Configure sensor args too short...")
@@ -164,9 +161,19 @@ class UART:
         elif received_thread[1] == DefaultsValues.CLEAN_DATA:
             return True
         elif received_thread[1] == DefaultsValues.GET_DATA_NUMBER:
-            return received_thread[2]
+            if len(received_thread) > DefaultsValues.GET_DATA_NUMBER_SIZE + 2:
+                return received_thread[2:4]
+            else:
+                self.log.error("Get data number args too short...")
+                return []
         elif received_thread[1] == DefaultsValues.PING:
             return received_thread[2]
+        if received_thread[1] == DefaultsValues.GET_REAL_TIME_INFO:
+            if len(received_thread) > DefaultsValues.GET_REAL_TIME_INFO_SIZE + 2:
+                return received_thread[2:4]
+            else:
+                self.log.error("Get real time infos args too short...")
+                return []
         else:
             self.log.error("Unknown command received...")
             return []
