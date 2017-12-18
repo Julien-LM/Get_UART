@@ -11,8 +11,9 @@
 
 import logging
 import os
+import time
 
-from DefaultsValues import choices
+import DefaultsValues
 
 
 class Interface(object):
@@ -75,7 +76,7 @@ class Interface(object):
         self.log.info("##################################################################")
         self.log.info("\nSelect one of the following action:")
 
-        for choice in choices:
+        for choice in DefaultsValues.choices:
             self.log.info("{id}) {text}".format(id=choice.get('id'), text=choice.get('text')))
 
     def log_init_info(self):
@@ -86,3 +87,51 @@ class Interface(object):
         self.log.info("##################################################################")
         self.log.info("                getUART initialization information                ")
         self.log.info("##################################################################\n")
+
+    def configure_sensor_interface(self):
+        """
+        Send getting temp rate
+        First 6 bits, value: from 0 to 63
+        Last 2 bits, unit: see DefaultsValues
+        return 0 if error detected
+        """
+        unit = -1
+        self.log.info("Enter time unit (seconds, minutes, hours)")
+        keyboard_input = self.get_input_char
+        for time_unit in DefaultsValues.TimeUnitValues:
+            if keyboard_input in time_unit:
+                self.log.info("Correct input, selected value: {}".format(time_unit))
+                unit = DefaultsValues.TimeUnitValues.get(time_unit)
+                break
+        if unit == -1:
+            self.log.warning("Wrong input... Back to main menu")
+            return 0
+
+        self.log.info("Enter time value, from 1 to 60")
+        keyboard_input = self.get_input_int()
+        if 1 <= keyboard_input <= 60:
+            self.log.info("Correct input, selected value: {}".format(keyboard_input))
+            self.log.debug("Arg: {arg:08b}, hex: {arg:02x}".format(arg=keyboard_input + (unit << 6)))
+            return [keyboard_input + (unit << 6)]
+        else:
+            self.log.warning("Wrong input... Back to main menu")
+            return 0
+
+
+class System(object):
+    """
+    Class PICom
+    """
+
+    def __init__(self):
+        self.log = logging.getLogger('get_UART')
+
+    def log_time(self):
+        """
+        Log time
+        """
+        self.log.info("Actual time")
+        self.log.info("{day:02d}/{month:02d}/{year} {hour:02d}:{minute:02d}:{seconds:02d}\n".format(
+            day=time.localtime().tm_mday, month=time.localtime().tm_mon,
+            year=time.localtime().tm_year, hour=time.localtime().tm_hour,
+            minute=time.localtime().tm_min, seconds=time.localtime().tm_sec))

@@ -13,20 +13,7 @@ import logging
 
 import DefaultsValues
 from Interface import Interface
-
-
-def convert_to_int(data):
-    """
-
-    :param data: data from UART
-    :type data: unichar
-    :return: data converted to int
-    :rtype: list of int
-    """
-    out = []
-    for val in data:
-        out.append(ord(val))
-    return out
+from PICom import PICom
 
 
 class UART(object):
@@ -42,6 +29,9 @@ class UART(object):
 
         # get interface
         self.interface = Interface()
+
+        # Get PICom
+        self.pic_com = PICom()
 
         self.serial_com = None
 
@@ -71,11 +61,7 @@ class UART(object):
                     self.log.error("!!! Com port not open !!!")
 
                 # Ping device
-                if self.ping_device():
-                    self.log.info("Device is right answering")
-                else:
-                    self.log.warning("Device is offline...")
-                    self.log.info("Run a diagnostic for more information")
+                self.ping_device()
         else:
             self.log.warning("\n!!!! Serial com have already be declared !!!!")
 
@@ -103,15 +89,19 @@ class UART(object):
             return self.serial_com.isOpen()
         return False
 
-    def parse_answer(self, command):
+    def parse_answer(self, command, first_read):
         """
         Parse answer from PIC
         :return: data from PIC
         :rtype: list
         """
-        received_thread, received_error = self.read()
+
+        received_thread, received_error = self.read(first_read)
         if received_error:
             self.log.error("Issue occurred during serial com read...")
+            return []
+
+        if not received_thread:
             return []
 
         # Parse each value received from PIC
@@ -136,46 +126,49 @@ class UART(object):
         # Check for line feed
         if received_thread[-1] == DefaultsValues.END_OF_TRANSMIT:
             self.log.debug("End of transmit char received")
+            first_read = False
         else:
             self.log.error("End of transmit chard have not been received...")
             return []
 
         # Check right command received
-        if command != received_thread[1]:
-            self.log.error("Received command doesn't match with sent one")
-            return []
+        if command != DefaultsValues.GET_REAL_TIME_INFO:
+            if command != DefaultsValues.GET_TEMP:
+                if command != received_thread[1]:
+                    self.log.error("Received command doesn't match with sent one")
+                    return []
 
         # Check for command
         self.log.debug("Received command: 0x{:02x}".format(received_thread[1]))
         if received_thread[1] == DefaultsValues.GET_TEMP:
-            return received_thread[2:(len(received_thread)-1)]
+            return self.pic_com.get_temp_parsing(received_thread[2:(len(received_thread)-1)])
         elif received_thread[1] == DefaultsValues.GET_TIME:
             if len(received_thread) > DefaultsValues.GET_TIME_SIZE + 2:
-                return received_thread[2:9]
+                return self.pic_com.get_time_parsing(received_thread[2:9])
             else:
                 self.log.error("Get time args too short...")
                 return []
         elif received_thread[1] == DefaultsValues.SET_TIME:
-            return True
+            return self.pic_com.set_time_parsing()
         elif received_thread[1] == DefaultsValues.CONFIGURE_SENSOR:
             if len(received_thread) > DefaultsValues.CONFIGURE_SENSOR_SIZE + 2:
-                return received_thread[2:4]
+                return self.pic_com.config_sensor_parsing(received_thread[2:4])
             else:
                 self.log.error("Configure sensor args too short...")
                 return []
         elif received_thread[1] == DefaultsValues.CLEAN_DATA:
-            return True
+            return self.pic_com.clean_data_parsing()
         elif received_thread[1] == DefaultsValues.GET_DATA_NUMBER:
             if len(received_thread) > DefaultsValues.GET_DATA_NUMBER_SIZE + 2:
-                return received_thread[2:4]
+                return self.pic_com.get_data_number_parsing(received_thread[2:4])
             else:
                 self.log.error("Get data number args too short...")
                 return []
         elif received_thread[1] == DefaultsValues.PING:
             return received_thread[2]
-        if received_thread[1] == DefaultsValues.GET_REAL_TIME_INFO:
+        elif received_thread[1] == DefaultsValues.GET_REAL_TIME_INFO:
             if len(received_thread) > DefaultsValues.GET_REAL_TIME_INFO_SIZE + 2:
-                return received_thread[2:4]
+                return self.pic_com.get_real_time_info(received_thread[2:4])
             else:
                 self.log.error("Get real time infos args too short...")
                 return []
@@ -183,7 +176,7 @@ class UART(object):
             self.log.error("Unknown command received...")
             return []
 
-    def read(self):
+    def read(self, first_read=True):
         """
         read serial port since getting end of transmit char
         :return: data, error
@@ -191,7 +184,8 @@ class UART(object):
         """
         read_data = []
         index = 0
-        self.log.debug("Start read data:")
+        if first_read:
+            self.log.debug("Start read data:")
         while True:
             try:
                 read_data.append(ord(self.serial_com.read()))
@@ -200,8 +194,11 @@ class UART(object):
                 self.log.exception("Serial error({0}): {1}".format(e.errno, e.strerror))
                 return read_data, True
             except TypeError:
-                self.log.error("Timeout occurred, device did not send anything for 1sec")
-                return read_data, True
+                if first_read:
+                    self.log.error("Timeout occurred, device did not send anything for 1sec")
+                    return read_data, True
+                else:
+                    return [], False
             if read_data[index] == DefaultsValues.END_OF_TRANSMIT:
                 self.log.debug("Number of data received: {}".format(len(read_data)))
                 return read_data, False
@@ -227,9 +224,7 @@ class UART(object):
         :rtype: bool
         """
         self.log.debug("Ping device")
-        if not self.send_UART_command(DefaultsValues.PING):
-            return 0
-        return True if self.parse_answer(DefaultsValues.PING) == DefaultsValues.PING else False
+        return self.pic_com.ping_parsing(self.send_UART_command(DefaultsValues.PING))
 
     def send_UART_command(self, command, args=None):
         """
@@ -254,8 +249,27 @@ class UART(object):
         if data_send_count > 20:
             self.log.warning("Data send > 20, PIC will probably turn to overflow")
 
-        self.log.debug("Data send: {}".format(data_send_count))
-        return 1
+        self.log.debug("Data sent: {}".format(data_send_count))
+        return self.parse_multi_answer(command)
+
+    def parse_multi_answer(self, command):
+        """
+        Check multi thread from PIC
+        :param command:
+        :type command:
+        :return:
+        :rtype:
+        """
+        return_list = [self.parse_answer(command, True)]
+
+        while True:
+            return_list.append(self.parse_answer(command, False))
+            if not return_list[-1]:
+                break
+        if len(return_list) == 2:
+            return return_list[0]
+        else:
+            return return_list
 
     def close_com_port(self):
         """
