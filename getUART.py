@@ -105,7 +105,7 @@ class Main(object):
         data_number = self.get_data_number()
         if data_number:
             if self.serial_com.send_UART_command(DefaultsValues.GET_TEMP):
-                received_data = self.serial_com.parse_answer()
+                received_data = self.serial_com.parse_answer(DefaultsValues.GET_TEMP)
                 if received_data:
                     if data_number == len(received_data):
                         self.log.info("Data received OK!!")
@@ -121,16 +121,18 @@ class Main(object):
         Get every real time info
         """
         if self.serial_com.send_UART_command(DefaultsValues.GET_REAL_TIME_INFO):
-            received_data = self.serial_com.parse_answer()
-            if received_data:
-                self.log.info("temp = {},{}".format(received_data[0], int(received_data[1] / 25.6)))
+            received_data = True
+            while received_data:
+                received_data = self.serial_com.parse_answer(DefaultsValues.GET_REAL_TIME_INFO)
+                if received_data:
+                    self.log.info("temp = {},{}".format(received_data[0], int(received_data[1] / 25.6)))
 
     def get_time(self):
         """
         Get time
         """
         if self.serial_com.send_UART_command(DefaultsValues.GET_TIME):
-            received_data = self.serial_com.parse_answer()
+            received_data = self.serial_com.parse_answer(DefaultsValues.GET_TIME)
             if received_data:
                 self.log.info("Time from PIC")
                 self.log.info("{day:02d}/{month:02d}/{century}{year} {hour:02d}:{minute:02d}:{seconds:02d}\n".format(
@@ -152,7 +154,7 @@ class Main(object):
                                               time.localtime().tm_hour,
                                               time.localtime().tm_min,
                                               time.localtime().tm_sec]):
-            if self.serial_com.parse_answer():
+            if self.serial_com.parse_answer(DefaultsValues.SET_TIME):
                 self.log.info("Time set successfully")
 
     def configure_sensor(self):
@@ -185,7 +187,7 @@ class Main(object):
         if self.serial_com.send_UART_command(DefaultsValues.CONFIGURE_SENSOR,
                                              [keyboard_input + (unit << 6)]):
             self.log.debug("Arg: {arg:08b}, hex: {arg:02x}".format(arg=keyboard_input + (unit << 6)))
-            received_data = self.serial_com.parse_answer()
+            received_data = self.serial_com.parse_answer(DefaultsValues.CONFIGURE_SENSOR)
             if received_data:
                 self.log.info("Sensor configured successfully")
                 self.log.debug("Value in sec: {}:{}".format(received_data[1], received_data[0]))
@@ -201,7 +203,7 @@ class Main(object):
         Get data number
         """
         if self.serial_com.send_UART_command(DefaultsValues.GET_DATA_NUMBER):
-            received_data = self.serial_com.parse_answer()
+            received_data = self.serial_com.parse_answer(DefaultsValues.GET_DATA_NUMBER)
             if received_data:
                 self.log.debug("Value: {}:{}".format(received_data[1], received_data[0]))
                 temp_data_number = received_data[0] + (received_data[1] << 8)

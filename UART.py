@@ -103,7 +103,7 @@ class UART(object):
             return self.serial_com.isOpen()
         return False
 
-    def parse_answer(self):
+    def parse_answer(self, command):
         """
         Parse answer from PIC
         :return: data from PIC
@@ -138,6 +138,11 @@ class UART(object):
             self.log.debug("End of transmit char received")
         else:
             self.log.error("End of transmit chard have not been received...")
+            return []
+
+        # Check right command received
+        if command != received_thread[1]:
+            self.log.error("Received command doesn't match with sent one")
             return []
 
         # Check for command
@@ -224,7 +229,7 @@ class UART(object):
         self.log.debug("Ping device")
         if not self.send_UART_command(DefaultsValues.PING):
             return 0
-        return True if self.parse_answer() == DefaultsValues.PING else False
+        return True if self.parse_answer(DefaultsValues.PING) == DefaultsValues.PING else False
 
     def send_UART_command(self, command, args=None):
         """
