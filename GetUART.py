@@ -154,13 +154,13 @@ class Main(object):
         """
         Export data current file
         """
-        print "export_data_current_file"
+        print("export_data_current_file")
 
     def export_data_new_file(self):
         """
         Export data new file
         """
-        print "export_data_new_file"
+        print("export_data_new_file")
 
     def recover_overflow(self):
         """

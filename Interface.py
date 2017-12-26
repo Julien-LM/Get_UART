@@ -131,7 +131,7 @@ class System(object):
         Log time
         """
         self.log.info("Actual time")
-        self.log.info("{day:02d}/{month:02d}/{year} {hour:02d}:{minute:02d}:{seconds:02d}\n".format(
+        self.log.info("{day:02d}/{month:02d}/{year} {hour:02d}:{minute:02d}:{seconds:02d}".format(
             day=time.localtime().tm_mday, month=time.localtime().tm_mon,
             year=time.localtime().tm_year, hour=time.localtime().tm_hour,
             minute=time.localtime().tm_min, seconds=time.localtime().tm_sec))
