@@ -173,11 +173,12 @@ class Main(object):
             self.log.error("Device is still stuck since overflow....")
 
     def __del__(self):
-        if not self.serial_com.is_open():
-            self.log.info("Com port is not open")
-        else:
-            self.serial_com.close_com_port()
-            self.log.info("Serial port com have been closed")
+        if hasattr(self, 'serial_com'):
+            if not self.serial_com.is_open():
+                self.log.info("Com port is not open")
+            else:
+                self.serial_com.close_com_port()
+                self.log.info("Serial port com have been closed")
 
 
 if __name__ == "__main__":
