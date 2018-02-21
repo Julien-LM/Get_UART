@@ -79,6 +79,8 @@ class Main(object):
                 self.config_sensor()
             elif keyboard_input == '5' or keyboard_input == 'clean':
                 self.clean_data()
+            elif keyboard_input == '6' or keyboard_input == 'nb_val':
+                self.get_data_number()
             elif keyboard_input == '9' or keyboard_input == 'log_time':
                 self.system.log_time()
             elif keyboard_input == 'p' or keyboard_input == 'ping':
@@ -87,6 +89,8 @@ class Main(object):
                 self.recover_overflow()
             elif keyboard_input == 'i' or keyboard_input == 'info':
                 self.serial_com.send_UART_command(DefaultsValues.GET_REAL_TIME_INFO)
+            elif keyboard_input == 'd' or keyboard_input == 'debug':
+                self.get_debug_values()
             elif keyboard_input == 'exit' or keyboard_input == 'q':
                 exit(0)
             else:
@@ -149,6 +153,12 @@ class Main(object):
         Get data number
         """
         return self.serial_com.send_UART_command(DefaultsValues.GET_DATA_NUMBER)
+
+    def get_debug_values(self):
+        """
+        Get debug values
+        """
+        return self.serial_com.send_UART_command(DefaultsValues.GET_DEBUG_VALUES)
 
     def export_data_current_file(self):
         """

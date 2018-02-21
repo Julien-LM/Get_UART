@@ -37,6 +37,8 @@ CLEAN_DATA              = 0x31
 GET_DATA_NUMBER         = 0x32
 PING                    = 0x33
 GET_REAL_TIME_INFO      = 0x34
+GET_DEBUG_VALUES        = 0x35
+
 
 # Temp data transfer protocol
 TIME_TRANSFERT_IND      = 0xFD
@@ -51,6 +53,8 @@ CONFIGURE_SENSOR_SIZE   = 2
 CLEAN_DATA_SIZE         = 0
 GET_DATA_NUMBER_SIZE    = 2
 GET_REAL_TIME_INFO_SIZE = 2
+GET_DEBUG_VALUES_SIZE   = 5
+
 
 #Config Sensor Unit
 SECONDS                 = 0
@@ -73,7 +77,8 @@ choices = [{'id': 0, 'text': 'Connect to PIC'},
            {'id': 9, 'text': 'Log current time'},
            {'id': 'p', 'text': 'Ping device'},
            {'id': 'r', 'text': 'Recover overflow'},
-           {'id': 'i', 'text': 'Get real time info'}]
+           {'id': 'i', 'text': 'Get real time info'},
+           {'id': 'd', 'text': 'Get debug values'}]
 
 # term log format
 normal = "\033[0m"

@@ -101,7 +101,7 @@ class PICom(object):
             # for data in received_data:
             #     self.log.info("data = 0x{:02x}".format(data))
         else:
-            self.log.error("Number of read data does not match with expected value")
+            self.log.warning("Number of read data does not match with expected value")
         return True
 
     def clean_data_parsing(self):
@@ -111,3 +111,15 @@ class PICom(object):
         self.log.info("Data cleaned")
         return True
 
+    def get_debug_value_parsing(self, received_data):
+        """
+        Log debug data from PIC
+        :param received_data: data from pic
+        :type received_data: list
+        """
+
+        self.log.info("Debug data:")
+        for data in received_data:
+            self.log.info("{}".format(data))
+
+        return True
