@@ -133,9 +133,11 @@ class Main(object):
         """
         Set time
         """
+
+        century = time.localtime().tm_year/100
         self.serial_com.send_UART_command(DefaultsValues.SET_TIME,
-                                          [20,
-                                           17,
+                                          [century,
+                                           (time.localtime().tm_year-century*100),
                                            time.localtime().tm_mon,
                                            time.localtime().tm_mday,
                                            time.localtime().tm_hour,
