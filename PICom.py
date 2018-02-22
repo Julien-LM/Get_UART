@@ -31,7 +31,11 @@ class PICom(object):
         """
         Get every real time info
         """
-        self.log.info("temp = {},{}".format(received_data[0], int(received_data[1] / 25.6)))
+        if len(received_data) == DefaultsValues.GET_REAL_TIME_INFO_SIZE:
+            self.log.info("temp = {},{}".format(received_data[0], int(received_data[1] / 25.6)))
+        else:
+            self.log.error("Get real time infos args too short...")
+            return []
         return True
 
     def config_sensor_parsing(self, received_data):
@@ -40,8 +44,12 @@ class PICom(object):
         :param received_data: Data from PIC
         :type received_data: list
         """
-        self.log.info("Sample rate config in sec: {}:{}".format(received_data[1], received_data[0]))
-        return True
+        if len(received_data) == DefaultsValues.CONFIGURE_SENSOR_SIZE:
+            self.log.info("Sample rate config in sec: {}:{}".format(received_data[1], received_data[0]))
+            return True
+        else:
+            self.log.error("Configure sensor args too short...")
+            return []
 
     def ping_parsing(self, answered_command):
         """
@@ -64,11 +72,15 @@ class PICom(object):
         :return: Number of data
         :rtype: int
         """
-        self.log.debug("Value: {}:{}".format(received_data[1], received_data[0]))
-        temp_data_number = received_data[0] + (received_data[1] << 8)
-        self.log.info("temp_data_number = {}".format(temp_data_number))
-        self.data_number = temp_data_number
-        return temp_data_number
+        if len(received_data) == DefaultsValues.GET_DATA_NUMBER_SIZE:
+            self.log.debug("Value: {}:{}".format(received_data[1], received_data[0]))
+            temp_data_number = received_data[0] + (received_data[1] << 8)
+            self.log.info("temp_data_number = {}".format(temp_data_number))
+            self.data_number = temp_data_number
+            return temp_data_number
+        else:
+            self.log.error("Get data number args too short...")
+            return []
 
     def set_time_parsing(self):
         """
@@ -81,14 +93,18 @@ class PICom(object):
         """
         get time
         """
-        self.log.info("Time from PIC")
-        self.log.info("{day:02d}/{month:02d}/{century}{year} {hour:02d}:{minute:02d}:{seconds:02d}\n".format(
-            day=received_data[3], month=received_data[2], year=received_data[1],
-            hour=received_data[4], minute=received_data[5], seconds=received_data[6],
-            century=received_data[0]))
+        if len(received_data) == DefaultsValues.GET_TIME_SIZE:
+            self.log.info("Time from PIC")
+            self.log.info("{day:02d}/{month:02d}/{century}{year} {hour:02d}:{minute:02d}:{seconds:02d}\n".format(
+                day=received_data[3], month=received_data[2], year=received_data[1],
+                hour=received_data[4], minute=received_data[5], seconds=received_data[6],
+                century=received_data[0]))
 
-        self.system.log_time()
-        return True
+            self.system.log_time()
+            return True
+        else:
+            self.log.error("Get time args too short...")
+            return []
 
     def get_temp_parsing(self, received_data):
         """

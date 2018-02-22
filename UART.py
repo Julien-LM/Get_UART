@@ -133,55 +133,47 @@ class UART(object):
 
         # Check right command received
         if command != DefaultsValues.GET_REAL_TIME_INFO:
+            # Get real time info send many data, as time, temp, nb value...
             if command != DefaultsValues.GET_TEMP:
+                # Get temp also send nb data
                 if command != received_thread[1]:
                     self.log.error("Received command doesn't match with sent one")
                     return []
 
         # Check for command
         self.log.debug("Received command: 0x{:02x}".format(received_thread[1]))
+
+        # Extract data from received thread
+        received_data = received_thread[2:(len(received_thread)-1)]
+
         # If GET_TEMP
         if received_thread[1] == DefaultsValues.GET_TEMP:
-            return self.pic_com.get_temp_parsing(received_thread[2:(len(received_thread)-1)])
+            return self.pic_com.get_temp_parsing(received_data)
         # If GET_TIME
         elif received_thread[1] == DefaultsValues.GET_TIME:
-            if len(received_thread) > DefaultsValues.GET_TIME_SIZE + 2:
-                return self.pic_com.get_time_parsing(received_thread[2:9])
-            else:
-                self.log.error("Get time args too short...")
-                return []
+            return self.pic_com.get_time_parsing(received_data)
         # If SET_TIME
         elif received_thread[1] == DefaultsValues.SET_TIME:
             return self.pic_com.set_time_parsing()
         # If CONFIGURE_SENSOR
         elif received_thread[1] == DefaultsValues.CONFIGURE_SENSOR:
-            if len(received_thread) > DefaultsValues.CONFIGURE_SENSOR_SIZE + 2:
-                return self.pic_com.config_sensor_parsing(received_thread[2:4])
-            else:
-                self.log.error("Configure sensor args too short...")
-                return []
+            return self.pic_com.config_sensor_parsing(received_data)
         # If CLEAN_DATA
         elif received_thread[1] == DefaultsValues.CLEAN_DATA:
             return self.pic_com.clean_data_parsing()
         # If GET_DATA_NUMBER
         elif received_thread[1] == DefaultsValues.GET_DATA_NUMBER:
-            if len(received_thread) > DefaultsValues.GET_DATA_NUMBER_SIZE + 2:
-                return self.pic_com.get_data_number_parsing(received_thread[2:4])
-            else:
-                self.log.error("Get data number args too short...")
-                return []
+            return self.pic_com.get_data_number_parsing(received_data)
         # If PING
         elif received_thread[1] == DefaultsValues.PING:
-            return received_thread[2]
+            return received_data[0]
         # If GET_REAL_TIME_INFO
         elif received_thread[1] == DefaultsValues.GET_REAL_TIME_INFO:
-            if len(received_thread) > DefaultsValues.GET_REAL_TIME_INFO_SIZE + 2:
-                return self.pic_com.get_real_time_info(received_thread[2:4])
-            else:
-                self.log.error("Get real time infos args too short...")
-                return []
+            return self.pic_com.get_real_time_info(received_data)
+        # If GET_DEBUG_VALUES
         elif received_thread[1] == DefaultsValues.GET_DEBUG_VALUES:
-            return self.pic_com.get_debug_value_parsing(received_thread[2:7])
+            return self.pic_com.get_debug_value_parsing(received_data)
+        # Unknown command...
         else:
             self.log.error("Unknown command received...")
             return []
