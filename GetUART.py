@@ -28,6 +28,7 @@ from Init import Init
 from Interface import Interface
 from UART import UART
 from Interface import System
+from temp_data_parsing import TempParsing
 
 
 class Main(object):
@@ -36,6 +37,8 @@ class Main(object):
     """
 
     def __init__(self, argv):
+
+        self.temp = TempParsing()
 
         # init, initialization class
         self.init = Init(argv)

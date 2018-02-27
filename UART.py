@@ -181,8 +181,8 @@ class UART(object):
     def read(self, first_read=True):
         """
         read serial port since getting end of transmit char
-        :return: data, error
         :rtype: list, bool
+        :return: data, error
         """
         read_data = []
         index = 0
