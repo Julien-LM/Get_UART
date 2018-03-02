@@ -1,6 +1,6 @@
 # coding=utf-8
 """
-    File name:  temp_data_parsing.py
+    File name:  TempDataParsing.py
     Author:     Julien LE MELLEC
     Mail:       julien.lemellec@gmail.com
     Created:    22/02/18
@@ -14,17 +14,19 @@ import datetime
 import logging
 
 import DefaultsValues
+from PlotCurve import PlotCurve
 
 
 class TempParsing(object):
     """
-    Class UART
+    Class TempParsing
     """
 
     def __init__(self):
         self.log = logging.getLogger('get_UART')
-        self.res_tab = [0xFD, 20, 18, 2, 27, 9, 30, 24, 0xFC, 0, 0, 0, 0x78, 65, 45, 65, 45, 65, 45, 65, 45, 65, 45,
-                        65, 45, 65, 45, 65, 45, 65, 45]
+        self.curve = PlotCurve()
+        self.res_tab = [0xFD, 20, 18, 3, 2, 9, 30, 24, 0xFC, 0, 0, 0, 0x78, 46, 45, 40, 45, 27, 45, 28, 45, 35, 45,
+                        37, 45, 39, 45, 41, 45, 43, 45]
         self.store_temp_data_to_readable_table(self.res_tab)
 
     def store_temp_data_to_readable_table(self, brut_data_from_pic):
@@ -54,9 +56,12 @@ class TempParsing(object):
                 reference_step = self.get_reference_step(brut_data_from_pic[(i - DefaultsValues.S_RATE_TRANSFERT_IND_S):i])
                 info = reference_step
             else:
-                output_tab.append({reference_time, self.get_temp_value(brut_data_from_pic[i:i+2])})
+                output_tab.append((reference_time, self.get_temp_value(brut_data_from_pic[i:i+2])))
                 reference_time = reference_time + reference_step
                 i += 2
+
+        self.curve.plot_first_curve(output_tab)
+
 
     def get_reference_time(self, time_tab):
 

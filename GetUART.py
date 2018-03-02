@@ -28,7 +28,7 @@ from Init import Init
 from Interface import Interface
 from UART import UART
 from Interface import System
-from temp_data_parsing import TempParsing
+from TempDataParsing import TempParsing
 
 
 class Main(object):
