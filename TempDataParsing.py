@@ -14,7 +14,6 @@ import datetime
 import logging
 
 import DefaultsValues
-from PlotCurve import PlotCurve
 
 
 class TempParsing(object):
@@ -24,10 +23,6 @@ class TempParsing(object):
 
     def __init__(self):
         self.log = logging.getLogger('get_UART')
-        self.curve = PlotCurve()
-        self.res_tab = [0xFD, 20, 18, 3, 2, 9, 30, 24, 0xFC, 0, 0, 0, 0x78, 46, 45, 40, 45, 27, 45, 28, 45, 35, 45,
-                        37, 45, 39, 45, 41, 45, 43, 45]
-        self.store_temp_data_to_readable_table(self.res_tab)
 
     def store_temp_data_to_readable_table(self, brut_data_from_pic):
         """
@@ -44,8 +39,6 @@ class TempParsing(object):
         i = 0
 
         while i < len(brut_data_from_pic):
-            leng = len(brut_data_from_pic)
-            info = brut_data_from_pic[i]
             if brut_data_from_pic[i] == DefaultsValues.TIME_TRANSFERT_IND:
                 i += DefaultsValues.TIME_TRANSFERT_IND_S + 1
                 reference_time = self.get_reference_time(
@@ -54,14 +47,12 @@ class TempParsing(object):
             elif brut_data_from_pic[i] == DefaultsValues.S_RATE_TRANSFERT_IND:
                 i += DefaultsValues.S_RATE_TRANSFERT_IND_S + 1
                 reference_step = self.get_reference_step(brut_data_from_pic[(i - DefaultsValues.S_RATE_TRANSFERT_IND_S):i])
-                info = reference_step
             else:
                 output_tab.append((reference_time, self.get_temp_value(brut_data_from_pic[i:i+2])))
                 reference_time = reference_time + reference_step
                 i += 2
 
-        self.curve.plot_first_curve(output_tab)
-
+        return output_tab
 
     def get_reference_time(self, time_tab):
 

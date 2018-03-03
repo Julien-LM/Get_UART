@@ -11,9 +11,8 @@
 
 import logging
 
-import matplotlib.pyplot as plt
 import matplotlib.dates as mat_dates
-import DefaultsValues
+import matplotlib.pyplot as plt
 
 
 class PlotCurve(object):
@@ -24,13 +23,21 @@ class PlotCurve(object):
     def __init__(self):
         self.log = logging.getLogger('get_UART')
 
-    def plot_first_curve(self, data_tab):
+    def plot_temp_curve(self, data_tab):
         x_array = []
         y_array = []
 
         for data in data_tab:
             x_array.append(data[0])
             y_array.append(data[1])
+
+        if not x_array or not y_array:
+            self.log.error("At least 1 tab is empty...")
+            return 0
+
+        if len(x_array) != len(y_array):
+            self.log.error("axis has not the same size")
+            return 0
 
         x_array = mat_dates.epoch2num(x_array)
 

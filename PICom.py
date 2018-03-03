@@ -12,6 +12,7 @@
 import logging
 import DefaultsValues
 from Interface import System
+from TempDataParsing import TempParsing
 
 
 class PICom(object):
@@ -25,7 +26,8 @@ class PICom(object):
         # System class
         self.system = System()
 
-        self.data_number = 0
+        # Temp parsing class
+        self.temp_parsing = TempParsing()
 
     def get_real_time_info(self, received_data):
         """
@@ -34,7 +36,7 @@ class PICom(object):
         if len(received_data) == DefaultsValues.GET_REAL_TIME_INFO_SIZE:
             self.log.info("temp = {},{}".format(received_data[0], int(received_data[1] / 25.6)))
         else:
-            self.log.error("Get real time infos args too short...")
+            self.log.error("Get real time info args too short...")
             return []
         return True
 
@@ -76,7 +78,6 @@ class PICom(object):
             self.log.debug("Value: {}:{}".format(received_data[1], received_data[0]))
             temp_data_number = received_data[0] + (received_data[1] << 8)
             self.log.info("temp_data_number = {}".format(temp_data_number))
-            self.data_number = temp_data_number
             return temp_data_number
         else:
             self.log.error("Get data number args too short...")
@@ -112,13 +113,8 @@ class PICom(object):
         :param received_data: data from pic
         :type received_data: list
         """
-        if self.data_number == len(received_data):
-            self.log.info("Data received OK!!")
-            # for data in received_data:
-            #     self.log.info("data = 0x{:02x}".format(data))
-        else:
-            self.log.warning("Number of read data does not match with expected value")
-        return True
+
+        return self.temp_parsing.store_temp_data_to_readable_table(received_data)
 
     def clean_data_parsing(self):
         """

@@ -28,7 +28,7 @@ from Init import Init
 from Interface import Interface
 from UART import UART
 from Interface import System
-from TempDataParsing import TempParsing
+from PlotCurve import PlotCurve
 
 
 class Main(object):
@@ -37,8 +37,6 @@ class Main(object):
     """
 
     def __init__(self, argv):
-
-        self.temp = TempParsing()
 
         # init, initialization class
         self.init = Init(argv)
@@ -57,6 +55,12 @@ class Main(object):
 
         # Define interface class
         self.interface = Interface()
+
+        # Plot curve class
+        self.plot_curve_class = PlotCurve()
+
+        # Temp data
+        self.temp_data_tab = []
 
     def main(self):
         """
@@ -84,8 +88,8 @@ class Main(object):
                 self.clean_data()
             elif keyboard_input == '6' or keyboard_input == 'nb_val':
                 self.get_data_number()
-            elif keyboard_input == '9' or keyboard_input == 'log_time':
-                self.system.log_time()
+            elif keyboard_input == '9' or keyboard_input == 'plot':
+                self.plot_curve()
             elif keyboard_input == 'p' or keyboard_input == 'ping':
                 self.serial_com.send_UART_command(DefaultsValues.PING)
             elif keyboard_input == 'r' or keyboard_input == 'recover':
@@ -115,6 +119,12 @@ class Main(object):
         """
         self.serial_com.ping_device()
 
+    def plot_curve(self):
+        """
+        Plot curve
+        """
+        self.plot_curve_class.plot_temp_curve(self.temp_data_tab)
+
     def get_temp(self):
         """
         Get temp storage
@@ -122,7 +132,7 @@ class Main(object):
         # First get number of data into the storage
         data_number = self.get_data_number()
         if data_number:
-            self.serial_com.send_UART_command(DefaultsValues.GET_TEMP)
+            self.temp_data_tab = self.serial_com.send_UART_command(DefaultsValues.GET_TEMP)
         else:
             self.log.warning("Storage empty... No data to read!")
 
@@ -169,13 +179,13 @@ class Main(object):
         """
         Export data current file
         """
-        print("export_data_current_file")
+        self.log.info("export_data_current_file")
 
     def export_data_new_file(self):
         """
         Export data new file
         """
-        print("export_data_new_file")
+        self.log.info("export_data_new_file")
 
     def recover_overflow(self):
         """
