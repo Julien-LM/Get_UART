@@ -98,6 +98,8 @@ class Main(object):
                 self.serial_com.send_UART_command(DefaultsValues.GET_REAL_TIME_INFO)
             elif keyboard_input == 'd' or keyboard_input == 'debug':
                 self.get_debug_values()
+            elif keyboard_input == 'r' or keyboard_input == 'read':
+                self.get_debug_values()
             elif keyboard_input == 'exit' or keyboard_input == 'q':
                 exit(0)
             else:
@@ -112,6 +114,14 @@ class Main(object):
         sensor_rate = self.interface.configure_sensor_interface()
         if sensor_rate != 0:
             self.serial_com.send_UART_command(DefaultsValues.CONFIGURE_SENSOR, sensor_rate)
+
+    def read_mem_max24aa(self):
+        """
+        Read mem
+        """
+        mem_address, nb_data_read = self.interface.read_mem_max24aa_interface()
+        if nb_data_read !=0:
+            self.serial_com.send_UART_command(DefaultsValues.READ_MEM_MAX24AA, [mem_address, nb_data_read])
 
     def ping(self):
         """

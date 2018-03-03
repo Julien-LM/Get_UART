@@ -74,8 +74,7 @@ class TempParsing(object):
             self.log.error("Get reference step, wrong arg size")
             return 0
 
-    @staticmethod
-    def get_temp_value(temp_tab):
+    def get_temp_value(self, temp_tab):
         """
         Get 2 Byte, build a real temperature value
         :param temp_tab: temp
@@ -83,6 +82,13 @@ class TempParsing(object):
         :return: temp
         :rtype: float
         """
-        real_part = temp_tab[1]/25.6
-        res = temp_tab[0] + real_part*0.1
-        return round(res, 2)
+        if len(temp_tab) != 2:
+            self.log.error("Table do not contains 2 elements")
+            self.log.warning("Table size is: {}".format(len(temp_tab)))
+            if len(temp_tab) == 1:
+                self.log.warning("tab[0] = {}".format(temp_tab[0]))
+            return 0
+        else:
+            real_part = temp_tab[1]/25.6
+            res = temp_tab[0] + real_part*0.1
+            return round(res, 2)

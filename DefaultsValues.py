@@ -38,6 +38,7 @@ GET_DATA_NUMBER         = 0x32
 PING                    = 0x33
 GET_REAL_TIME_INFO      = 0x34
 GET_DEBUG_VALUES        = 0x35
+READ_MEM_MAX24AA        = 0x36
 
 
 # Temp data transfer protocol
@@ -51,7 +52,7 @@ GET_TIME_SIZE           = 7
 SET_TIME_SIZE           = 0
 CONFIGURE_SENSOR_SIZE   = 2
 CLEAN_DATA_SIZE         = 0
-GET_DATA_NUMBER_SIZE    = 2
+GET_DATA_NUMBER_SIZE    = 4
 GET_REAL_TIME_INFO_SIZE = 2
 GET_DEBUG_VALUES_SIZE   = 5
 
@@ -78,7 +79,8 @@ choices = [{'id': 0, 'text': 'Connect to PIC'},
            {'id': 'p', 'text': 'Ping device'},
            {'id': 'r', 'text': 'Recover overflow'},
            {'id': 'i', 'text': 'Get real time info'},
-           {'id': 'd', 'text': 'Get debug values'}]
+           {'id': 'd', 'text': 'Get debug values'},
+           {'id': 'r', 'text': 'Read data from max24aa'}]
 
 # term log format
 normal = "\033[0m"

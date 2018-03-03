@@ -117,6 +117,9 @@ class Interface(object):
             self.log.warning("Wrong input... Back to main menu")
             return 0
 
+    def read_mem_max24aa_interface(self):
+        return 5, 10
+
 
 class System(object):
     """
