@@ -115,8 +115,6 @@ class PICom(object):
         :param received_data: data from pic
         :type received_data: list
         """
-        for ite, data in enumerate(received_data):
-            self.log.debug("nb: {}, data: {}".format(ite, data))
         return self.temp_parsing.store_temp_data_to_readable_table(received_data)
 
     def clean_data_parsing(self):

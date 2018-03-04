@@ -191,7 +191,7 @@ class UART(object):
         while True:
             try:
                 read_data.append(ord(self.serial_com.read()))
-                self.log.debug("0x{:02x}".format(read_data[index]))
+                self.log.debug("nb: {}  0x{:02x}".format(index, read_data[index]))
             except serial.SerialException as e:
                 self.log.exception("Serial error({0}): {1}".format(e.errno, e.strerror))
                 return read_data, True
