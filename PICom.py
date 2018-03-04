@@ -75,8 +75,10 @@ class PICom(object):
         :rtype: int
         """
         if len(received_data) == DefaultsValues.GET_DATA_NUMBER_SIZE:
-            self.log.debug("Value: {}:{}".format(received_data[1], received_data[0]))
-            temp_data_number = received_data[0] + (received_data[1] << 8)
+            self.log.debug("Value: {}:{}:{}:{}".format(
+                received_data[3], received_data[2], received_data[1], received_data[0]))
+            temp_data_number = \
+                received_data[0] + (received_data[1] << 8) + (received_data[2] << 16) + (received_data[3] << 24)
             self.log.info("temp_data_number = {}".format(temp_data_number))
             return temp_data_number
         else:
@@ -113,7 +115,8 @@ class PICom(object):
         :param received_data: data from pic
         :type received_data: list
         """
-
+        for ite, data in enumerate(received_data):
+            self.log.debug("nb: {}, data: {}".format(ite, data))
         return self.temp_parsing.store_temp_data_to_readable_table(received_data)
 
     def clean_data_parsing(self):
